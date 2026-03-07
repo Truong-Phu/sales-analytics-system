@@ -1,0 +1,18 @@
+# Visual Studio
+.vs/
+bin/
+obj/
+
+# Node / React
+node_modules/
+build/
+
+# Logs
+*.log
+
+# Environment
+.env
+
+# OS
+.DS_Store
+Thumbs.db
