@@ -1,4 +1,4 @@
-﻿// ============================================================
+// ============================================================
 // FILE: Controllers/LogsController.cs
 // UC8: Ghi log và theo dõi hoạt động hệ thống
 // Quyền: Chỉ Admin
@@ -25,8 +25,8 @@ public class LogsController : ControllerBase
     /// </summary>
     [HttpGet]
     public async Task<IActionResult> GetAll(
-        [FromQuery] int page = 1,
-        [FromQuery] int pageSize = 50,
-        [FromQuery] int? userId = null)
+        [FromQuery] int  page     = 1,
+        [FromQuery] int  pageSize = 50,
+        [FromQuery] int? userId   = null)
         => Ok(await _repo.GetAllAsync(page, pageSize, userId));
 }

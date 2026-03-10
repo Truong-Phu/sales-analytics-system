@@ -1,4 +1,4 @@
-﻿// ============================================================
+// ============================================================
 // FILE: Repositories/ChannelRepository.cs
 // Mục đích: Quản lý kênh bán hàng — UC10: Quản lý kênh bán hàng
 // ============================================================
@@ -28,10 +28,10 @@ public class ChannelRepository : IChannelRepository
             .OrderBy(c => c.ChannelId)
             .Select(c => new ChannelDto
             {
-                ChannelId = c.ChannelId,
+                ChannelId   = c.ChannelId,
                 ChannelName = c.ChannelName,
                 Description = c.Description,
-                IsActive = c.IsActive
+                IsActive    = c.IsActive
             })
             .ToListAsync();
     }
@@ -42,10 +42,10 @@ public class ChannelRepository : IChannelRepository
                     .Where(c => c.ChannelId == id)
                     .Select(c => new ChannelDto
                     {
-                        ChannelId = c.ChannelId,
+                        ChannelId   = c.ChannelId,
                         ChannelName = c.ChannelName,
                         Description = c.Description,
-                        IsActive = c.IsActive
+                        IsActive    = c.IsActive
                     })
                     .FirstOrDefaultAsync();
 
@@ -65,7 +65,7 @@ public class ChannelRepository : IChannelRepository
 
         channel.ChannelName = dto.ChannelName;
         channel.Description = dto.Description;
-        channel.IsActive = dto.IsActive;
+        channel.IsActive    = dto.IsActive;
 
         await _db.SaveChangesAsync();
         return channel;

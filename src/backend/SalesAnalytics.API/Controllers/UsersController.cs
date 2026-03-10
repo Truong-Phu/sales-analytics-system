@@ -1,4 +1,4 @@
-﻿// ============================================================
+// ============================================================
 // FILE: Controllers/UsersController.cs
 // UC2: Quản lý người dùng và phân quyền
 // Quyền: Chỉ Admin
@@ -150,5 +150,45 @@ public class UsersController : ControllerBase
         await _logRepo.AddAsync(CurrentUserId, "CHANGE_PASSWORD",
                                 "users", id, ClientIp);
         return Ok(new { message = "Đổi mật khẩu thành công." });
+    }
+
+    // ─── GET /api/users/pending — Danh sách chờ duyệt ──────
+    /// <summary>Admin: Xem danh sách tài khoản đang chờ phê duyệt</summary>
+    [HttpGet("pending")]
+    [Authorize(Policy = "AdminOnly")]
+    public async Task<IActionResult> GetPending()
+    {
+        var list = await _repo.GetPendingUsersAsync();
+        await _logRepo.AddAsync(CurrentUserId, "VIEW_PENDING_USERS",
+                                ipAddress: ClientIp);
+        return Ok(list);
+    }
+
+    // ─── PATCH /api/users/{id}/approve — Duyệt tài khoản ──
+    /// <summary>Admin: Phê duyệt tài khoản đăng ký (isApproved = true)</summary>
+    [HttpPatch("{id:int}/approve")]
+    [Authorize(Policy = "AdminOnly")]
+    public async Task<IActionResult> ApproveUser(int id)
+    {
+        var ok = await _repo.ApproveUserAsync(id);
+        if (!ok) return NotFound(new { message = "Không tìm thấy tài khoản." });
+
+        await _logRepo.AddAsync(CurrentUserId, $"APPROVE_USER: userId={id}",
+                                "users", id, ClientIp);
+        return Ok(new { message = "Đã phê duyệt tài khoản thành công." });
+    }
+
+    // ─── PATCH /api/users/{id}/reject — Từ chối tài khoản ─
+    /// <summary>Admin: Từ chối và xóa tài khoản đăng ký chờ duyệt</summary>
+    [HttpPatch("{id:int}/reject")]
+    [Authorize(Policy = "AdminOnly")]
+    public async Task<IActionResult> RejectUser(int id)
+    {
+        var ok = await _repo.RejectUserAsync(id);
+        if (!ok) return NotFound(new { message = "Không tìm thấy tài khoản." });
+
+        await _logRepo.AddAsync(CurrentUserId, $"REJECT_USER: userId={id}",
+                                "users", id, ClientIp);
+        return Ok(new { message = "Đã từ chối và xóa tài khoản." });
     }
 }

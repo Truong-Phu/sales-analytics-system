@@ -1,4 +1,4 @@
-﻿// ============================================================
+// ============================================================
 // FILE: Repositories/LogRepository.cs
 // Mục đích: Ghi và xem nhật ký — UC8: Ghi log hoạt động hệ thống
 // ============================================================
@@ -24,18 +24,18 @@ public class LogRepository : ILogRepository
     public async Task AddAsync(
         int userId,
         string action,
-        string? tableName = null,
-        int? recordId = null,
-        string? ipAddress = null)
+        string? tableName  = null,
+        int?    recordId   = null,
+        string? ipAddress  = null)
     {
         _db.Logs.Add(new Log
         {
-            UserId = userId,
-            Action = action,
-            TableName = tableName,
-            RecordId = recordId,
-            IpAddress = ipAddress,
-            CreatedAt = DateTime.UtcNow
+            UserId     = userId,
+            Action     = action,
+            TableName  = tableName,
+            RecordId   = recordId,
+            IpAddress  = ipAddress,
+            CreatedAt  = DateTime.UtcNow
         });
         await _db.SaveChangesAsync();
     }
@@ -58,24 +58,24 @@ public class LogRepository : ILogRepository
             .Take(pageSize)
             .Select(l => new LogDto
             {
-                LogId = l.LogId,
-                UserId = l.UserId,
-                Username = l.User.Username,
-                FullName = l.User.FullName ?? l.User.Username,
-                Action = l.Action,
-                TableName = l.TableName,
-                RecordId = l.RecordId,
-                IpAddress = l.IpAddress,
-                CreatedAt = l.CreatedAt
+                LogId      = l.LogId,
+                UserId     = l.UserId,
+                Username   = l.User.Username,
+                FullName   = l.User.FullName ?? l.User.Username,
+                Action     = l.Action,
+                TableName  = l.TableName,
+                RecordId   = l.RecordId,
+                IpAddress  = l.IpAddress,
+                CreatedAt  = l.CreatedAt
             })
             .ToListAsync();
 
         return new PagedLogsDto
         {
-            Items = items,
+            Items      = items,
             TotalCount = total,
-            Page = page,
-            PageSize = pageSize
+            Page       = page,
+            PageSize   = pageSize
         };
     }
 }

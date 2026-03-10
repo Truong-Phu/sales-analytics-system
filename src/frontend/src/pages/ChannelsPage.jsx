@@ -1,4 +1,4 @@
-﻿// ============================================================
+// ============================================================
 // FILE: src/pages/ChannelsPage.jsx — UC10
 // ============================================================
 import { useState, useEffect } from 'react';
@@ -17,7 +17,7 @@ export default function ChannelsPage() {
   const showToast = (msg, type='success') => { setToast({msg,type}); setTimeout(()=>setToast(null),3000); };
   const load = () => channelsApi.getAll().then(r=>setItems(r.data||[])).catch(()=>showToast('Lỗi tải','error'));
 
-  useEffect(() => { document.getElementById('page-title-slot').textContent = 'Kênh bán hàng'; load(); }, []);
+  useEffect(() => { { const _t = document.getElementById('page-title-slot'); if (_t) _t.textContent = 'Kênh bán hàng'; } load(); }, []);
 
   const save = async () => {
     if (!form.channelName.trim()) { showToast('Tên kênh là bắt buộc','error'); return; }

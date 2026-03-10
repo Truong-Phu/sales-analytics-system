@@ -1,4 +1,4 @@
-﻿// ============================================================
+// ============================================================
 // FILE: Controllers/CustomersController.cs
 // UC11: Quản lý khách hàng
 // ============================================================
@@ -17,13 +17,13 @@ namespace SalesAnalytics.API.Controllers;
 public class CustomersController : ControllerBase
 {
     private readonly ICustomerRepository _repo;
-    private readonly ILogRepository _logRepo;
+    private readonly ILogRepository      _logRepo;
 
     public CustomersController(
         ICustomerRepository repo,
-        ILogRepository logRepo)
+        ILogRepository      logRepo)
     {
-        _repo = repo;
+        _repo    = repo;
         _logRepo = logRepo;
     }
 
@@ -37,9 +37,9 @@ public class CustomersController : ControllerBase
     /// <summary>UC11: Xem danh sách khách hàng</summary>
     [HttpGet]
     public async Task<IActionResult> GetAll(
-        [FromQuery] int page = 1,
-        [FromQuery] int pageSize = 20,
-        [FromQuery] string? search = null)
+        [FromQuery] int     page     = 1,
+        [FromQuery] int     pageSize = 20,
+        [FromQuery] string? search   = null)
         => Ok(await _repo.GetAllAsync(page, pageSize, search));
 
     // ─── GET /api/customers/{id} ────────────────────────────
@@ -65,9 +65,9 @@ public class CustomersController : ControllerBase
         var customer = new Customer
         {
             CustomerName = dto.CustomerName.Trim(),
-            Phone = dto.Phone?.Trim(),
-            Email = dto.Email?.Trim(),
-            Address = dto.Address?.Trim()
+            Phone        = dto.Phone?.Trim(),
+            Email        = dto.Email?.Trim(),
+            Address      = dto.Address?.Trim()
         };
 
         var created = await _repo.CreateAsync(customer);

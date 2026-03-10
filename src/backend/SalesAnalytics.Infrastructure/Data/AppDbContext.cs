@@ -1,9 +1,7 @@
-﻿// ============================================================
+// ============================================================
 // FILE: Data/AppDbContext.cs
 // Map toàn bộ 9 bảng từ soursecode_csdl.docx
 // ============================================================
-using System.Collections.Generic;
-using System.Reflection.Emit;
 using Microsoft.EntityFrameworkCore;
 using SalesAnalytics.Core.Entities;
 
@@ -52,6 +50,7 @@ public class AppDbContext : DbContext
             e.Property(x => x.IsActive).HasColumnName("is_active").HasDefaultValue(true);
             e.Property(x => x.CreatedAt).HasColumnName("created_at").HasDefaultValueSql("CURRENT_TIMESTAMP");
             e.Property(x => x.UpdatedAt).HasColumnName("updated_at").HasDefaultValueSql("CURRENT_TIMESTAMP");
+            e.Property(x => x.IsApproved).HasColumnName("is_approved").HasDefaultValue(true);
             e.HasIndex(x => x.Username).IsUnique();
 
             e.HasOne(x => x.Role)

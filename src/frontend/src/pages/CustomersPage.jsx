@@ -1,4 +1,4 @@
-﻿// FILE: src/pages/CustomersPage.jsx — UC11
+// FILE: src/pages/CustomersPage.jsx — UC11
 import { useState, useEffect, useCallback } from 'react';
 import { customersApi } from '../services/api';
 import { useAuth } from '../context/AuthContext';
@@ -25,7 +25,7 @@ export default function CustomersPage() {
     finally { setLoading(false); }
   }, [page, search]);
 
-  useEffect(() => { document.getElementById('page-title-slot').textContent = 'Khách hàng'; }, []);
+  useEffect(() => { { const _t = document.getElementById('page-title-slot'); if (_t) _t.textContent = 'Khách hàng'; } }, []);
   useEffect(() => { load(); }, [load]);
 
   const save = async () => {

@@ -1,4 +1,4 @@
-﻿// ============================================================
+// ============================================================
 // FILE: Program.cs — ASP.NET Core 8
 // ĐÃ SỬA: thứ tự middleware CORS + JSON serialization
 // ============================================================
@@ -38,21 +38,21 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     {
         options.TokenValidationParameters = new TokenValidationParameters
         {
-            ValidateIssuer = true,
-            ValidateAudience = true,
-            ValidateLifetime = true,
+            ValidateIssuer           = true,
+            ValidateAudience         = true,
+            ValidateLifetime         = true,
             ValidateIssuerSigningKey = true,
-            ValidIssuer = builder.Configuration["Jwt:Issuer"],
-            ValidAudience = builder.Configuration["Jwt:Audience"],
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))
+            ValidIssuer              = builder.Configuration["Jwt:Issuer"],
+            ValidAudience            = builder.Configuration["Jwt:Audience"],
+            IssuerSigningKey         = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))
         };
     });
 
 builder.Services.AddAuthorization(options =>
 {
-    options.AddPolicy("AdminOnly", policy => policy.RequireRole("Admin"));
+    options.AddPolicy("AdminOnly",   policy => policy.RequireRole("Admin"));
     options.AddPolicy("ManagerOnly", policy => policy.RequireRole("Admin", "Manager"));
-    options.AddPolicy("StaffOnly", policy => policy.RequireRole("Admin", "Staff"));
+    options.AddPolicy("StaffOnly",   policy => policy.RequireRole("Admin", "Staff"));
 });
 
 // ─── 4. CORS — PHẢI khai báo trước Build() ───────────────────
@@ -78,8 +78,8 @@ builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
         // camelCase: Token → token, UserId → userId, FullName → fullName
-        options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
-        options.JsonSerializerOptions.DictionaryKeyPolicy = JsonNamingPolicy.CamelCase;
+        options.JsonSerializerOptions.PropertyNamingPolicy        = JsonNamingPolicy.CamelCase;
+        options.JsonSerializerOptions.DictionaryKeyPolicy         = JsonNamingPolicy.CamelCase;
         options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
     });
 
@@ -89,18 +89,18 @@ builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo
     {
-        Title = "Sales Analytics API",
-        Version = "v1",
+        Title       = "Sales Analytics API",
+        Version     = "v1",
         Description = "API Hệ thống Thu thập, Quản lý và Phân tích Dữ liệu Bán hàng Đa kênh"
     });
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
-        Name = "Authorization",
-        Type = SecuritySchemeType.ApiKey,
-        Scheme = "Bearer",
+        Name         = "Authorization",
+        Type         = SecuritySchemeType.ApiKey,
+        Scheme       = "Bearer",
         BearerFormat = "JWT",
-        In = ParameterLocation.Header,
-        Description = "Nhập: Bearer {token}"
+        In           = ParameterLocation.Header,
+        Description  = "Nhập: Bearer {token}"
     });
     c.AddSecurityRequirement(new OpenApiSecurityRequirement
     {

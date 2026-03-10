@@ -1,4 +1,4 @@
-﻿// ============================================================
+// ============================================================
 // FILE: src/pages/ProfilePage.jsx
 // UC1 mở rộng: Xem thông tin cá nhân + Đổi mật khẩu
 // Dành cho: ALL roles (Admin, Manager, Staff)
@@ -17,8 +17,8 @@ export default function ProfilePage() {
   const showToast = (msg, type = 'success') => { setToast({ msg, type }); setTimeout(() => setToast(null), 3500); };
 
   useEffect(() => {
-    document.getElementById('page-title-slot').textContent = 'Hồ sơ cá nhân';
-    // Xóa dòng authApi.login; vì nó đang gây lỗi đỏ
+    { const _t = document.getElementById('page-title-slot'); if (_t) _t.textContent = 'Hồ sơ cá nhân'; }
+    // Lấy thông tin từ JWT đã lưu
     setMeData(user);
   }, [user]);
 

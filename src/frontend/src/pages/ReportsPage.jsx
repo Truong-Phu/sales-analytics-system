@@ -1,4 +1,4 @@
-﻿// ============================================================
+// ============================================================
 // FILE: src/pages/ReportsPage.jsx — UC7: Xuất báo cáo tổng hợp
 // Actor: Admin, Manager
 // Trang riêng cho chức năng xuất báo cáo — tách khỏi Thống kê
@@ -6,27 +6,40 @@
 import { useState, useEffect } from 'react';
 import { statisticsApi, downloadBlob } from '../services/api';
 
-const fmt = n => n >= 1e9 ? (n/1e9).toFixed(2)+' tỷ' : n >= 1e6 ? (n/1e6).toFixed(0)+'M' : n?.toLocaleString('vi-VN') ?? '—';
+const fmt = n => n == null ? '—' : Math.round(n).toLocaleString('vi-VN');
 
 export default function ReportsPage() {
-  const [fromDate, setFromDate] = useState('2025-01-01');
-  const [toDate,   setToDate]   = useState('2025-03-31');
-  const [summary,  setSummary]  = useState(null);
-  const [loading,  setLoading]  = useState(false);
-  const [exporting, setExporting] = useState(null); // track which button
-  const [toast,    setToast]    = useState(null);
+  const [fromDate,  setFromDate]  = useState('');
+  const [toDate,    setToDate]    = useState('');
+  const [summary,   setSummary]   = useState(null);
+  const [loading,   setLoading]   = useState(false);
+  const [exporting, setExporting] = useState(null);
+  const [toast,     setToast]     = useState(null);
+  const [dateRange, setDateRange] = useState(null);
 
   const showToast = (msg, type='success') => { setToast({msg,type}); setTimeout(()=>setToast(null),3500); };
 
   useEffect(() => {
-    document.getElementById('page-title-slot').textContent = 'Xuất báo cáo';
-    loadSummary();
+    { const _t = document.getElementById('page-title-slot'); if (_t) _t.textContent = 'Xuất báo cáo'; }
+    statisticsApi.getDateRange().then(r => {
+      const { minDate, maxDate } = r.data;
+      setDateRange({ minDate, maxDate });
+      setFromDate(minDate);
+      setToDate(maxDate);
+      loadSummaryWith(minDate, maxDate);
+    }).catch(() => {
+      const fd = '2025-01-01', td = '2025-12-31';
+      setFromDate(fd); setToDate(td);
+      loadSummaryWith(fd, td);
+    });
   }, []);
 
-  const loadSummary = async () => {
+  const loadSummary = async () => loadSummaryWith(fromDate, toDate);
+
+  const loadSummaryWith = async (fd, td) => {
     setLoading(true);
     try {
-      const r = await statisticsApi.getSummaryReport({ fromDate, toDate });
+      const r = await statisticsApi.getSummaryReport({ fromDate: fd, toDate: td });
       setSummary(r.data);
     } catch { showToast('Không tải được dữ liệu tóm tắt', 'error'); }
     finally { setLoading(false); }
@@ -92,7 +105,7 @@ export default function ReportsPage() {
       }}>
         <span style={{ fontSize: 18 }}>📄</span>
         <span>
-          <strong style={{ color:'var(--text)' }}>UC7: Xuất báo cáo tổng hợp</strong>
+          <strong style={{ color:"var(--text)" }}>Xuất báo cáo tổng hợp theo kỳ</strong>
           {' '}— Tạo và tải về báo cáo tình hình kinh doanh theo kỳ thời gian được chọn.
         </span>
       </div>
@@ -120,17 +133,38 @@ export default function ReportsPage() {
             </button>
           </div>
 
-          {/* Quick ranges */}
-          <div style={{ marginLeft:'auto', display:'flex', gap:6 }}>
-            {[
-              { label:'T1/2025', from:'2025-01-01', to:'2025-01-31' },
-              { label:'T2/2025', from:'2025-02-01', to:'2025-02-28' },
-              { label:'T3/2025', from:'2025-03-01', to:'2025-03-31' },
-              { label:'Q1/2025', from:'2025-01-01', to:'2025-03-31' },
-            ].map(q => (
+          {/* Quick ranges — tự sinh từ khoảng ngày trong DB */}
+          <div style={{ marginLeft:'auto', display:'flex', gap:6, flexWrap:'wrap' }}>
+            {(() => {
+              const minY = dateRange ? parseInt(dateRange.minDate.slice(0,4)) : new Date().getFullYear();
+              const maxY = dateRange ? parseInt(dateRange.maxDate.slice(0,4)) : new Date().getFullYear();
+              const buttons = [];
+              for (let y = minY; y <= maxY; y++) {
+                const yr = String(y).slice(2);
+                const lastFeb = new Date(y, 2, 0).getDate();
+                [
+                  [`T1/${yr}`,`${y}-01-01`,`${y}-01-31`],[`T2/${yr}`,`${y}-02-01`,`${y}-02-${lastFeb}`],
+                  [`T3/${yr}`,`${y}-03-01`,`${y}-03-31`],[`T4/${yr}`,`${y}-04-01`,`${y}-04-30`],
+                  [`T5/${yr}`,`${y}-05-01`,`${y}-05-31`],[`T6/${yr}`,`${y}-06-01`,`${y}-06-30`],
+                  [`T7/${yr}`,`${y}-07-01`,`${y}-07-31`],[`T8/${yr}`,`${y}-08-01`,`${y}-08-31`],
+                  [`T9/${yr}`,`${y}-09-01`,`${y}-09-30`],[`T10/${yr}`,`${y}-10-01`,`${y}-10-31`],
+                  [`T11/${yr}`,`${y}-11-01`,`${y}-11-30`],[`T12/${yr}`,`${y}-12-01`,`${y}-12-31`],
+                  [`Q1/${yr}`,`${y}-01-01`,`${y}-03-31`],[`Q2/${yr}`,`${y}-04-01`,`${y}-06-30`],
+                  [`Q3/${yr}`,`${y}-07-01`,`${y}-09-30`],[`Q4/${yr}`,`${y}-10-01`,`${y}-12-31`],
+                  [`${y}`,`${y}-01-01`,`${y}-12-31`],
+                ].forEach(([label, from, to]) => {
+                  if (dateRange && (to < dateRange.minDate || from > dateRange.maxDate)) return;
+                  buttons.push({ label, from, to });
+                });
+              }
+              return buttons;
+            })().map(q => (
               <button key={q.label} className="btn btn-ghost btn-sm"
-                style={{ fontSize:10, padding:'4px 10px' }}
-                onClick={() => { setFromDate(q.from); setToDate(q.to); }}>
+                style={{ fontSize:10, padding:'4px 10px',
+                  background: fromDate===q.from && toDate===q.to ? 'rgba(34,197,94,.15)' : '',
+                  color:      fromDate===q.from && toDate===q.to ? 'var(--green)' : '',
+                }}
+                onClick={() => { setFromDate(q.from); setToDate(q.to); loadSummaryWith(q.from, q.to); }}>
                 {q.label}
               </button>
             ))}
@@ -142,10 +176,10 @@ export default function ReportsPage() {
       {summary && (
         <div style={{ display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:10, marginBottom:20 }}>
           {[
-            { label:'Tổng doanh thu',  val:fmt(summary.totalRevenue)+' đ',  color:'var(--green3)' },
-            { label:'Tổng đơn hàng',   val:summary.totalOrders+' đơn',      color:'var(--blue)' },
-            { label:'Đơn hoàn thành',  val:summary.completedOrders+' đơn',  color:'var(--green)' },
-            { label:'Giá trị TB/đơn',  val:fmt(summary.avgOrderValue)+' đ', color:'var(--amber)' },
+            { label:'Tổng doanh thu',  val:fmt(summary.kpi.totalRevenue)+' VNĐ',  color:'var(--green3)' },
+            { label:'Tổng đơn hàng',   val:summary.kpi.totalOrdersAll+' đơn',      color:'var(--blue)' },
+            { label:'Đơn hoàn thành',  val:summary.kpi.totalOrdersCompleted+' đơn',  color:'var(--green)' },
+            { label:'Giá trị TB/đơn',  val:fmt(summary.kpi.avgOrderValue)+' VNĐ', color:'var(--amber)' },
           ].map((s,i) => (
             <div key={i} className="card" style={{ padding:'14px 16px' }}>
               <div style={{ fontSize:10, color:'var(--dim)', fontFamily:'Space Mono,monospace', textTransform:'uppercase', letterSpacing:'.8px', marginBottom:6 }}>{s.label}</div>

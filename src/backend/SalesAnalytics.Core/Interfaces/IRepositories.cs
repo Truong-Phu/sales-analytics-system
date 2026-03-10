@@ -1,4 +1,4 @@
-﻿// ============================================================
+// ============================================================
 // INTERFACES — Repository pattern
 // ============================================================
 using SalesAnalytics.Core.DTOs.Orders;
@@ -17,6 +17,8 @@ namespace SalesAnalytics.Core.Interfaces;
 public interface IAuthRepository
 {
     Task<User?> GetByUsernameAsync(string username);
+    Task<User?> GetByIdAsync(int id);
+    Task<User?> GetPendingByUsernameAsync(string username);
     Task<bool> UsernameExistsAsync(string username);
 }
 
@@ -28,6 +30,9 @@ public interface IUserRepository
     Task<User> CreateAsync(User user);
     Task<User?> UpdateAsync(int id, UpdateUserDto dto);
     Task<bool> DeleteAsync(int id);
+    Task<List<UserDto>> GetPendingUsersAsync();
+    Task<bool> ApproveUserAsync(int userId);
+    Task<bool> RejectUserAsync(int userId);
     Task<bool> ChangePasswordAsync(int id, string newPasswordHash);
 }
 
@@ -86,8 +91,10 @@ public interface ICategoryRepository
 public interface IStatisticsRepository
 {
     Task<DashboardKpiDto> GetDashboardKpiAsync();
+    Task<DashboardKpiDto> GetKpiByPeriodAsync(DateOnly from, DateOnly to);
     Task<List<RevenueByChannelDto>> GetRevenueByChannelAsync(DateOnly? from, DateOnly? to);
-    Task<List<RevenueByMonthDto>> GetRevenueByMonthAsync(int? year);
+    Task<List<RevenueByMonthDto>> GetRevenueByMonthAsync(DateOnly from, DateOnly to);
+    Task<(DateOnly MinDate, DateOnly MaxDate)> GetOrderDateRangeAsync();
     Task<List<RevenueByDayDto>> GetRevenueByDayAsync(DateOnly from, DateOnly to);
     Task<List<TopProductDto>> GetTopProductsAsync(DateOnly? from, DateOnly? to, int topN);
     Task<List<RevenueByCategoryDto>> GetRevenueByCategoryAsync(DateOnly? from, DateOnly? to);

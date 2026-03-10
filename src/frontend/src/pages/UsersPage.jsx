@@ -1,4 +1,4 @@
-﻿// ============================================================
+// ============================================================
 // FILE: src/pages/UsersPage.jsx — UC2
 // ============================================================
 import { useState, useEffect, useCallback } from 'react';
@@ -26,7 +26,7 @@ export default function UsersPage() {
     finally { setLoading(false); }
   }, [page]);
 
-  useEffect(() => { document.getElementById('page-title-slot').textContent = 'Người dùng'; }, []);
+  useEffect(() => { { const _t = document.getElementById('page-title-slot'); if (_t) _t.textContent = 'Người dùng'; } }, []);
   useEffect(() => { load(); }, [load]);
 
   const save = async () => {

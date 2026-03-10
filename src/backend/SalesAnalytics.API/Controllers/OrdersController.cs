@@ -1,4 +1,4 @@
-﻿// ============================================================
+// ============================================================
 // FILE: Controllers/OrdersController.cs
 // UC3: Thu thập dữ liệu bán hàng đa kênh
 // UC4: Quản lý dữ liệu bán hàng (đơn hàng)
@@ -9,7 +9,6 @@ using Microsoft.AspNetCore.Mvc;
 using SalesAnalytics.Core.DTOs.Orders;
 using SalesAnalytics.Core.Entities;
 using SalesAnalytics.Core.Interfaces;
-using SalesAnalytics.Infrastructure.Repositories;
 
 namespace SalesAnalytics.API.Controllers;
 
@@ -19,11 +18,11 @@ namespace SalesAnalytics.API.Controllers;
 public class OrdersController : ControllerBase
 {
     private readonly IOrderRepository _repo;
-    private readonly ILogRepository _logRepo;
+    private readonly ILogRepository   _logRepo;
 
     public OrdersController(IOrderRepository repo, ILogRepository logRepo)
     {
-        _repo = repo;
+        _repo    = repo;
         _logRepo = logRepo;
     }
 
@@ -71,20 +70,20 @@ public class OrdersController : ControllerBase
 
         var order = new Order
         {
-            OrderDate = dto.OrderDate,
+            OrderDate  = dto.OrderDate,
             CustomerId = dto.CustomerId,
-            ChannelId = dto.ChannelId,
-            Status = dto.Status,
-            Note = dto.Note,
-            CreatedBy = CurrentUserId
+            ChannelId  = dto.ChannelId,
+            Status     = dto.Status,
+            Note       = dto.Note,
+            CreatedBy  = CurrentUserId
         };
 
         var details = dto.Items.Select(i => new OrderDetail
         {
             ProductId = i.ProductId,
-            Quantity = i.Quantity,
+            Quantity  = i.Quantity,
             UnitPrice = i.UnitPrice,
-            Discount = i.Discount
+            Discount  = i.Discount
         }).ToList();
 
         var created = await _repo.CreateAsync(order, details);

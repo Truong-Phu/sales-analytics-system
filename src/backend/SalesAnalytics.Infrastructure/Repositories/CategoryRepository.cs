@@ -1,4 +1,4 @@
-﻿// ============================================================
+// ============================================================
 // FILE: Repositories/CategoryRepository.cs
 // Mục đích: Quản lý danh mục sản phẩm (hỗ trợ UC9)
 // ============================================================
@@ -22,9 +22,9 @@ public class CategoryRepository : ICategoryRepository
                     .OrderBy(c => c.CategoryId)
                     .Select(c => new CategoryDto
                     {
-                        CategoryId = c.CategoryId,
+                        CategoryId   = c.CategoryId,
                         CategoryName = c.CategoryName,
-                        Description = c.Description
+                        Description  = c.Description
                     })
                     .ToListAsync();
 
@@ -34,9 +34,9 @@ public class CategoryRepository : ICategoryRepository
                     .Where(c => c.CategoryId == id)
                     .Select(c => new CategoryDto
                     {
-                        CategoryId = c.CategoryId,
+                        CategoryId   = c.CategoryId,
                         CategoryName = c.CategoryName,
-                        Description = c.Description
+                        Description  = c.Description
                     })
                     .FirstOrDefaultAsync();
 

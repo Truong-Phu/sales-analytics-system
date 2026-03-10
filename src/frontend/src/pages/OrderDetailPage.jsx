@@ -1,4 +1,4 @@
-﻿// ============================================================
+// ============================================================
 // FILE: src/pages/OrderDetailPage.jsx
 // UC4: Chi tiết đơn hàng — trang riêng, không phải panel
 // ============================================================
@@ -21,7 +21,7 @@ export default function OrderDetailPage() {
   const showToast = (msg, type='success') => { setToast({msg,type}); setTimeout(()=>setToast(null),3000); };
 
   useEffect(() => {
-    document.getElementById('page-title-slot').textContent = `Đơn hàng #${id}`;
+    { const _t = document.getElementById('page-title-slot'); if (_t) _t.textContent = `Đơn hàng #${id}`; }
     ordersApi.getById(id)
       .then(r => setOrder(r.data))
       .catch(() => showToast('Không tìm thấy đơn hàng', 'error'))
@@ -72,7 +72,7 @@ export default function OrderDetailPage() {
         </div>
         <div style={{ textAlign:'right' }}>
           <div style={{ fontSize:11, color:'var(--dim)', fontFamily:'Space Mono,monospace', marginBottom:4 }}>Tổng giá trị</div>
-          <div style={{ fontSize:28, fontWeight:700, color:'var(--green3)', fontFamily:'Space Mono,monospace' }}>{fmt(order.totalAmount)} đ</div>
+          <div style={{ fontSize:28, fontWeight:700, color:'var(--green3)', fontFamily:'Space Mono,monospace' }}>{fmt(order.totalAmount)} VNĐ</div>
         </div>
       </div>
 
@@ -124,9 +124,9 @@ export default function OrderDetailPage() {
               <tr key={d.orderDetailId}>
                 <td style={{ fontFamily:'Space Mono,monospace', color:'var(--dim)', fontSize:11 }}>{i+1}</td>
                 <td style={{ fontWeight:500 }}>{d.productName}</td>
-                <td style={{ fontFamily:'Space Mono,monospace', color:'var(--dim)', fontSize:12 }}>{fmt(d.unitPrice)} đ</td>
+                <td style={{ fontFamily:'Space Mono,monospace', color:'var(--dim)', fontSize:12 }}>{fmt(d.unitPrice)} VNĐ</td>
                 <td style={{ fontFamily:'Space Mono,monospace', textAlign:'center' }}>× {d.quantity}</td>
-                <td style={{ fontFamily:'Space Mono,monospace', color:'var(--green3)', fontWeight:600 }}>{fmt(d.quantity * d.unitPrice)} đ</td>
+                <td style={{ fontFamily:'Space Mono,monospace', color:'var(--green3)', fontWeight:600 }}>{fmt(d.quantity * d.unitPrice)} VNĐ</td>
               </tr>
             ))}
           </tbody>
@@ -135,7 +135,7 @@ export default function OrderDetailPage() {
         {/* Total row */}
         <div style={{ padding:'14px 18px', borderTop:'1px solid var(--border)', display:'flex', justifyContent:'flex-end', gap:24, fontSize:13 }}>
           <span style={{ color:'var(--dim)' }}>Tổng cộng:</span>
-          <span style={{ fontFamily:'Space Mono,monospace', fontWeight:700, color:'var(--green3)', fontSize:18 }}>{fmt(subtotal)} đ</span>
+          <span style={{ fontFamily:'Space Mono,monospace', fontWeight:700, color:'var(--green3)', fontSize:18 }}>{fmt(subtotal)} VNĐ</span>
         </div>
       </div>
 

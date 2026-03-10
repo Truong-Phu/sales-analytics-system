@@ -1,4 +1,4 @@
-﻿// ============================================================
+// ============================================================
 // FILE: Entities/Order.cs
 // Map: bảng orders trong PostgreSQL
 // Status hợp lệ: 'pending' | 'completed' | 'cancelled' | 'refunded'

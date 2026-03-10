@@ -1,4 +1,4 @@
-﻿// ============================================================
+// ============================================================
 // FILE: Entities/OrderDetail.cs
 // Map: bảng order_details trong PostgreSQL
 // Cột subtotal: GENERATED ALWAYS AS STORED trong DB

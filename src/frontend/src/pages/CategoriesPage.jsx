@@ -1,4 +1,4 @@
-﻿// ============================================================
+// ============================================================
 // FILE: src/pages/CategoriesPage.jsx
 // Quản lý danh mục sản phẩm — Admin only
 // API: GET/POST/DELETE /api/categories
@@ -22,7 +22,7 @@ export default function CategoriesPage() {
     finally { setLoading(false); }
   };
 
-  useEffect(() => { document.getElementById('page-title-slot').textContent = 'Danh mục sản phẩm'; load(); }, []);
+  useEffect(() => { { const _t = document.getElementById('page-title-slot'); if (_t) _t.textContent = 'Danh mục sản phẩm'; } load(); }, []);
 
   const save = async () => {
     if (!form.categoryName.trim()) { showToast('Tên danh mục là bắt buộc', 'error'); return; }
@@ -45,7 +45,7 @@ export default function CategoriesPage() {
     <div style={{ maxWidth: 800 }}>
       <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:14 }}>
         <div style={{ fontSize:11, color:'var(--dim)', fontFamily:'Space Mono,monospace' }}>
-          {/* Quản lý danh mục sản phẩm — liên kết với UC9 */}
+          // Quản lý danh mục sản phẩm — liên kết với UC9
         </div>
         <button className="btn btn-primary" onClick={()=>{ setForm({categoryName:''}); setModal(true); }}>+ Thêm danh mục</button>
       </div>
@@ -56,7 +56,7 @@ export default function CategoriesPage() {
           <span style={{ fontSize:11, color:'var(--dim)', fontFamily:'Space Mono,monospace' }}>{items.length} danh mục</span>
         </div>
         {loading ? (
-          <div style={{ padding:32, textAlign:'center', color:'var(--dim)', fontFamily:'Space Mono,monospace' }}>{/* Đang tải...*/}</div>
+          <div style={{ padding:32, textAlign:'center', color:'var(--dim)', fontFamily:'Space Mono,monospace' }}>// Đang tải...</div>
         ) : (
           <table>
             <thead><tr><th>#</th><th>Tên danh mục</th><th>Số sản phẩm</th><th>Thao tác</th></tr></thead>
@@ -79,7 +79,7 @@ export default function CategoriesPage() {
                 </tr>
               ))}
               {items.length === 0 && (
-                <tr><td colSpan={4} style={{ textAlign:'center', color:'var(--dim)', padding:24, fontFamily:'Space Mono,monospace' }}>{/* Chưa có danh mục nào */}</td></tr>
+                <tr><td colSpan={4} style={{ textAlign:'center', color:'var(--dim)', padding:24, fontFamily:'Space Mono,monospace' }}>// Chưa có danh mục nào</td></tr>
               )}
             </tbody>
           </table>

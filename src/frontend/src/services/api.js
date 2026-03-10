@@ -1,4 +1,4 @@
-﻿// ============================================================
+// ============================================================
 // FILE: src/services/api.js
 // Axios instance + JWT interceptor — kết nối với ASP.NET Core API
 // ============================================================
@@ -43,19 +43,25 @@ api.interceptors.response.use(
 // AUTH — UC1
 // ══════════════════════════════════════════════════════════
 export const authApi = {
-  login: (data) => api.post('/Auth/login', data),
+  login:          (data) => api.post('/auth/login', data),
+  logout:         ()     => api.post('/auth/logout'),
+  register:       (data) => api.post('/auth/register', data),
   changePassword: (data) => api.post('/auth/change-password', data),
+  getMe:          ()     => api.get('/auth/me'),
 };
 
 // ══════════════════════════════════════════════════════════
 // USERS — UC2
 // ══════════════════════════════════════════════════════════
 export const usersApi = {
-  getAll: (params) => api.get('/users', { params }),
-  getById: (id) => api.get(`/users/${id}`),
-  create: (data) => api.post('/users', data),
-  update: (id, data) => api.put(`/users/${id}`, data),
-  delete: (id) => api.delete(`/users/${id}`),
+  getAll:          (params) => api.get('/users', { params }),
+  getById:         (id)     => api.get(`/users/${id}`),
+  create:          (data)   => api.post('/users', data),
+  update:          (id, data) => api.put(`/users/${id}`, data),
+  delete:          (id)     => api.delete(`/users/${id}`),
+  getPending:      ()       => api.get('/users/pending'),
+  approve:         (id)     => api.patch(`/users/${id}/approve`),
+  reject:          (id)     => api.patch(`/users/${id}/reject`),
 };
 
 // ══════════════════════════════════════════════════════════
@@ -114,6 +120,7 @@ export const categoriesApi = {
 // STATISTICS — UC5 + UC6 + UC7
 // ══════════════════════════════════════════════════════════
 export const statisticsApi = {
+  getDateRange:      ()       => api.get('/statistics/date-range'),
   // UC6: Dashboard
   getKpi: () => api.get('/statistics/dashboard/kpi'),
   getRevenueByChannel: (params) => api.get('/statistics/dashboard/revenue-by-channel', { params }),

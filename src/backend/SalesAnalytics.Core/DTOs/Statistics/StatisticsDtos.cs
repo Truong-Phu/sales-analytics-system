@@ -1,4 +1,4 @@
-﻿// ============================================================
+// ============================================================
 // STATISTICS DTOs — UC5: Thống kê & phân tích dữ liệu bán hàng
 //                   UC6: Dashboard trực quan
 //                   UC7: Xuất báo cáo tổng hợp
@@ -18,6 +18,8 @@ public class DashboardKpiDto
     public decimal RevenueThisMonth { get; set; }
     public int OrdersToday { get; set; }
     public decimal RevenueToday { get; set; }
+    public int TotalCustomers { get; set; }
+    public int TotalProducts { get; set; }
 }
 
 // --- UC5+UC6: Doanh thu theo kênh ---

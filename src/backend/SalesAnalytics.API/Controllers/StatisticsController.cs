@@ -1,4 +1,4 @@
-﻿// ============================================================
+// ============================================================
 // FILE: Controllers/StatisticsController.cs
 // UC5: Thống kê & phân tích | UC6: Dashboard | UC7: Xuất báo cáo
 // ============================================================
@@ -29,6 +29,15 @@ public class StatisticsController : ControllerBase
         int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
 
     // ─── UC6: Dashboard KPI ────────────────────────────────
+    /// <summary>Lấy khoảng ngày min/max của đơn hàng trong DB — dùng để init filter</summary>
+    [HttpGet("date-range")]
+    [Authorize(Policy = "ManagerOnly")]
+    public async Task<IActionResult> GetDateRange()
+    {
+        var (min, max) = await _repo.GetOrderDateRangeAsync();
+        return Ok(new { minDate = min.ToString("yyyy-MM-dd"), maxDate = max.ToString("yyyy-MM-dd") });
+    }
+
     /// <summary>UC6: Lấy KPI tổng hợp cho Dashboard</summary>
     [HttpGet("dashboard/kpi")]
     [Authorize(Policy = "ManagerOnly")]
@@ -73,11 +82,17 @@ public class StatisticsController : ControllerBase
         => Ok(await _repo.GetTopProductsAsync(fromDate, toDate, topN));
 
     // ─── UC5: Thống kê theo tháng ─────────────────────────
-    /// <summary>UC5: Doanh thu theo tháng</summary>
+    /// <summary>UC5: Doanh thu theo tháng — nhận fromDate/toDate</summary>
     [HttpGet("revenue-by-month")]
     [Authorize(Policy = "ManagerOnly")]
-    public async Task<IActionResult> GetRevenueByMonth([FromQuery] int? year = null)
-        => Ok(await _repo.GetRevenueByMonthAsync(year ?? DateTime.Today.Year));
+    public async Task<IActionResult> GetRevenueByMonth(
+        [FromQuery] DateOnly? fromDate = null,
+        [FromQuery] DateOnly? toDate = null)
+    {
+        var from = fromDate ?? new DateOnly(DateTime.Today.Year, 1, 1);
+        var to = toDate ?? DateOnly.FromDateTime(DateTime.Today);
+        return Ok(await _repo.GetRevenueByMonthAsync(from, to));
+    }
 
     // ─── UC5: Doanh thu theo danh mục ─────────────────────
     /// <summary>UC5: Doanh thu theo danh mục sản phẩm</summary>
@@ -111,19 +126,14 @@ public class StatisticsController : ControllerBase
         wsKpi.Cell("A2").Value = $"Từ ngày {from:dd/MM/yyyy} đến {to:dd/MM/yyyy}";
         wsKpi.Cell("A4").Value = "Chỉ số"; wsKpi.Cell("B4").Value = "Giá trị";
         wsKpi.Cell("A4").Style.Font.Bold = true; wsKpi.Cell("B4").Style.Font.Bold = true;
-        var kpiRows = new[]
-        {
-            ("Tổng đơn hàng",        report.Kpi.TotalOrdersAll),
-            ("Đơn hoàn thành",       report.Kpi.TotalOrdersCompleted),
-            ("Đơn hủy",              report.Kpi.TotalOrdersCancelled),
-            ("Tổng doanh thu (VNĐ)", report.Kpi.TotalRevenue),
-            ("Giá trị TB đơn hàng",  report.Kpi.AvgOrderValue),
-        };
-        for (int i = 0; i < kpiRows.Length; i++)
-        {
-            wsKpi.Cell(5 + i, 1).Value = kpiRows[i].Item1;
-            wsKpi.Cell(5 + i, 2).Value = kpiRows[i].Item2;
-        }
+
+        // Ghi từng dòng KPI trực tiếp — tránh lỗi type 'object' với ClosedXML
+        wsKpi.Cell(5, 1).Value = "Tổng đơn hàng"; wsKpi.Cell(5, 2).Value = report.Kpi.TotalOrdersAll;
+        wsKpi.Cell(6, 1).Value = "Đơn hoàn thành"; wsKpi.Cell(6, 2).Value = report.Kpi.TotalOrdersCompleted;
+        wsKpi.Cell(7, 1).Value = "Đơn hủy"; wsKpi.Cell(7, 2).Value = report.Kpi.TotalOrdersCancelled;
+        wsKpi.Cell(8, 1).Value = "Tổng doanh thu (VNĐ)"; wsKpi.Cell(8, 2).Value = report.Kpi.TotalRevenue;
+        wsKpi.Cell(9, 1).Value = "Giá trị TB đơn hàng"; wsKpi.Cell(9, 2).Value = report.Kpi.AvgOrderValue;
+
         wsKpi.Columns().AdjustToContents();
 
         // ── Sheet 2: Doanh thu theo kênh ──

@@ -1,4 +1,4 @@
-﻿// ============================================================
+// ============================================================
 // FILE: src/pages/LogsPage.jsx — UC8: Ghi log & Theo dõi hệ thống
 // Actor: Admin only
 // ============================================================
@@ -26,7 +26,7 @@ export default function LogsPage() {
     finally { setLoading(false); }
   }, [page, userId]);
 
-  useEffect(() => { document.getElementById('page-title-slot').textContent = 'Nhật ký hệ thống'; }, []);
+  useEffect(() => { { const _t = document.getElementById('page-title-slot'); if (_t) _t.textContent = 'Nhật ký hệ thống'; } }, []);
   useEffect(() => { load(); }, [load]);
 
   // Colour-code action types
@@ -54,7 +54,7 @@ export default function LogsPage() {
       {/* Toolbar */}
       <div style={{ display:'flex', alignItems:'center', gap:10, marginBottom:14, flexWrap:'wrap' }}>
         <div style={{ fontSize:11, color:'var(--dim)', fontFamily:'Space Mono,monospace' }}>
-          // UC8: Tự động ghi nhận mọi thao tác người dùng
+          Tự động ghi nhận mọi thao tác người dùng trong hệ thống
         </div>
         <div style={{ marginLeft:'auto', display:'flex', gap:8 }}>
           <select className="form-input" style={{ width:160 }} value={userId}

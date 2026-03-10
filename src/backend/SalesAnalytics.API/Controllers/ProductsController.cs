@@ -1,4 +1,4 @@
-﻿// ============================================================
+// ============================================================
 // FILE: Controllers/ProductsController.cs
 // UC9: Quản lý sản phẩm
 // ============================================================
@@ -17,16 +17,16 @@ namespace SalesAnalytics.API.Controllers;
 [Authorize]
 public class ProductsController : ControllerBase
 {
-    private readonly IProductRepository _repo;
+    private readonly IProductRepository  _repo;
     private readonly ICategoryRepository _catRepo;
-    private readonly ILogRepository _logRepo;
+    private readonly ILogRepository      _logRepo;
 
     public ProductsController(
-        IProductRepository repo,
+        IProductRepository  repo,
         ICategoryRepository catRepo,
-        ILogRepository logRepo)
+        ILogRepository      logRepo)
     {
-        _repo = repo;
+        _repo    = repo;
         _catRepo = catRepo;
         _logRepo = logRepo;
     }
@@ -41,10 +41,10 @@ public class ProductsController : ControllerBase
     /// <summary>UC9: Danh sách sản phẩm (phân trang + tìm kiếm)</summary>
     [HttpGet]
     public async Task<IActionResult> GetAll(
-        [FromQuery] int page = 1,
-        [FromQuery] int pageSize = 20,
-        [FromQuery] string? search = null,
-        [FromQuery] bool? isActive = null)
+        [FromQuery] int     page     = 1,
+        [FromQuery] int     pageSize = 20,
+        [FromQuery] string? search   = null,
+        [FromQuery] bool?   isActive = null)
         => Ok(await _repo.GetAllAsync(page, pageSize, search, isActive));
 
     // ─── GET /api/products/active ───────────────────────────
@@ -76,10 +76,10 @@ public class ProductsController : ControllerBase
         var product = new Product
         {
             ProductName = dto.ProductName.Trim(),
-            CategoryId = dto.CategoryId,
-            Price = dto.Price,
-            Unit = dto.Unit?.Trim(),
-            IsActive = true
+            CategoryId  = dto.CategoryId,
+            Price       = dto.Price,
+            Unit        = dto.Unit?.Trim(),
+            IsActive    = true
         };
 
         var created = await _repo.CreateAsync(product);
@@ -146,7 +146,7 @@ public class ProductsController : ControllerBase
         var category = new Category
         {
             CategoryName = dto.CategoryName.Trim(),
-            Description = dto.Description?.Trim()
+            Description  = dto.Description?.Trim()
         };
 
         var created = await _catRepo.CreateAsync(category);

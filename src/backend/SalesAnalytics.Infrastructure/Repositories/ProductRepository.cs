@@ -1,4 +1,4 @@
-﻿// ============================================================
+// ============================================================
 // FILE: Repositories/ProductRepository.cs
 // Mục đích: Quản lý sản phẩm — UC9: Quản lý sản phẩm
 // ============================================================
@@ -39,23 +39,23 @@ public class ProductRepository : IProductRepository
             .Take(pageSize)
             .Select(p => new ProductDto
             {
-                ProductId = p.ProductId,
-                ProductName = p.ProductName,
-                CategoryId = p.CategoryId,
+                ProductId    = p.ProductId,
+                ProductName  = p.ProductName,
+                CategoryId   = p.CategoryId,
                 CategoryName = p.Category != null ? p.Category.CategoryName : null,
-                Price = p.Price,
-                Unit = p.Unit,
-                IsActive = p.IsActive,
-                CreatedAt = p.CreatedAt
+                Price        = p.Price,
+                Unit         = p.Unit,
+                IsActive     = p.IsActive,
+                CreatedAt    = p.CreatedAt
             })
             .ToListAsync();
 
         return new PagedProductsDto
         {
-            Items = items,
+            Items      = items,
             TotalCount = total,
-            Page = page,
-            PageSize = pageSize
+            Page       = page,
+            PageSize   = pageSize
         };
     }
 
@@ -66,14 +66,14 @@ public class ProductRepository : IProductRepository
                     .Where(p => p.ProductId == id)
                     .Select(p => new ProductDto
                     {
-                        ProductId = p.ProductId,
-                        ProductName = p.ProductName,
-                        CategoryId = p.CategoryId,
+                        ProductId    = p.ProductId,
+                        ProductName  = p.ProductName,
+                        CategoryId   = p.CategoryId,
                         CategoryName = p.Category != null ? p.Category.CategoryName : null,
-                        Price = p.Price,
-                        Unit = p.Unit,
-                        IsActive = p.IsActive,
-                        CreatedAt = p.CreatedAt
+                        Price        = p.Price,
+                        Unit         = p.Unit,
+                        IsActive     = p.IsActive,
+                        CreatedAt    = p.CreatedAt
                     })
                     .FirstOrDefaultAsync();
 
@@ -85,13 +85,13 @@ public class ProductRepository : IProductRepository
                     .OrderBy(p => p.ProductName)
                     .Select(p => new ProductDto
                     {
-                        ProductId = p.ProductId,
-                        ProductName = p.ProductName,
-                        CategoryId = p.CategoryId,
+                        ProductId    = p.ProductId,
+                        ProductName  = p.ProductName,
+                        CategoryId   = p.CategoryId,
                         CategoryName = p.Category != null ? p.Category.CategoryName : null,
-                        Price = p.Price,
-                        Unit = p.Unit,
-                        IsActive = p.IsActive
+                        Price        = p.Price,
+                        Unit         = p.Unit,
+                        IsActive     = p.IsActive
                     })
                     .ToListAsync();
 
@@ -110,11 +110,11 @@ public class ProductRepository : IProductRepository
         if (product == null) return null;
 
         product.ProductName = dto.ProductName;
-        product.CategoryId = dto.CategoryId;
-        product.Price = dto.Price;
-        product.Unit = dto.Unit;
-        product.IsActive = dto.IsActive;
-        product.UpdatedAt = DateTime.UtcNow;
+        product.CategoryId  = dto.CategoryId;
+        product.Price       = dto.Price;
+        product.Unit        = dto.Unit;
+        product.IsActive    = dto.IsActive;
+        product.UpdatedAt   = DateTime.UtcNow;
 
         await _db.SaveChangesAsync();
         return product;

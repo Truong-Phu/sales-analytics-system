@@ -1,4 +1,4 @@
-﻿// ============================================================
+// ============================================================
 // FILE: src/pages/ProductsPage.jsx — UC9
 // ============================================================
 import { useState, useEffect, useCallback } from 'react';
@@ -35,7 +35,7 @@ export default function ProductsPage() {
   }, [page, search]);
 
   useEffect(() => {
-    document.getElementById('page-title-slot').textContent = 'Sản phẩm';
+    { const _t = document.getElementById('page-title-slot'); if (_t) _t.textContent = 'Sản phẩm'; }
     categoriesApi.getAll().then(r => setCategories(r.data || [])).catch(()=>{});
   }, []);
   useEffect(() => { load(); }, [load]);
@@ -87,7 +87,7 @@ export default function ProductsPage() {
                   <td style={{fontFamily:'Space Mono,monospace',color:'var(--dim)',fontSize:11}}>{String(p.productId).padStart(3,'0')}</td>
                   <td style={{fontWeight:500}}>{p.productName}</td>
                   <td><span style={{padding:'2px 8px',borderRadius:4,fontSize:10,background:'rgba(96,165,250,.1)',color:'var(--blue)',fontFamily:'Space Mono,monospace'}}>{p.categoryName||'—'}</span></td>
-                  <td style={{fontFamily:'Space Mono,monospace',color:'var(--green3)'}}>{fmt(p.price)} đ</td>
+                  <td style={{fontFamily:'Space Mono,monospace',color:'var(--green3)'}}>{fmt(p.price)} VNĐ</td>
                   <td style={{color:'var(--dim)',fontSize:11}}>{p.createdAt?.slice(0,10)}</td>
                   <td style={{display:'flex',gap:4}}>
                     {isAdmin && <>

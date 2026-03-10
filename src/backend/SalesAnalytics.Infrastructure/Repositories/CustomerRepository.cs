@@ -1,4 +1,4 @@
-﻿// ============================================================
+// ============================================================
 // FILE: Repositories/CustomerRepository.cs
 // Mục đích: Quản lý khách hàng — UC11: Quản lý khách hàng
 // ============================================================
@@ -34,21 +34,21 @@ public class CustomerRepository : ICustomerRepository
             .Take(pageSize)
             .Select(c => new CustomerDto
             {
-                CustomerId = c.CustomerId,
+                CustomerId   = c.CustomerId,
                 CustomerName = c.CustomerName,
-                Phone = c.Phone,
-                Email = c.Email,
-                Address = c.Address,
-                CreatedAt = c.CreatedAt
+                Phone        = c.Phone,
+                Email        = c.Email,
+                Address      = c.Address,
+                CreatedAt    = c.CreatedAt
             })
             .ToListAsync();
 
         return new PagedCustomersDto
         {
-            Items = items,
+            Items      = items,
             TotalCount = total,
-            Page = page,
-            PageSize = pageSize
+            Page       = page,
+            PageSize   = pageSize
         };
     }
 
@@ -58,12 +58,12 @@ public class CustomerRepository : ICustomerRepository
                     .Where(c => c.CustomerId == id)
                     .Select(c => new CustomerDto
                     {
-                        CustomerId = c.CustomerId,
+                        CustomerId   = c.CustomerId,
                         CustomerName = c.CustomerName,
-                        Phone = c.Phone,
-                        Email = c.Email,
-                        Address = c.Address,
-                        CreatedAt = c.CreatedAt
+                        Phone        = c.Phone,
+                        Email        = c.Email,
+                        Address      = c.Address,
+                        CreatedAt    = c.CreatedAt
                     })
                     .FirstOrDefaultAsync();
 
@@ -82,10 +82,10 @@ public class CustomerRepository : ICustomerRepository
         if (customer == null) return null;
 
         customer.CustomerName = dto.CustomerName;
-        customer.Phone = dto.Phone;
-        customer.Email = dto.Email;
-        customer.Address = dto.Address;
-        customer.UpdatedAt = DateTime.UtcNow;
+        customer.Phone        = dto.Phone;
+        customer.Email        = dto.Email;
+        customer.Address      = dto.Address;
+        customer.UpdatedAt    = DateTime.UtcNow;
 
         await _db.SaveChangesAsync();
         return customer;

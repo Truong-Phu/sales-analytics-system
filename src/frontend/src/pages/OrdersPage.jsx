@@ -1,4 +1,4 @@
-﻿// ============================================================
+// ============================================================
 // FILE: src/pages/OrdersPage.jsx — UC3 + UC4
 // ============================================================
 import { useState, useEffect, useCallback } from 'react';
@@ -7,20 +7,23 @@ import { ordersApi, customersApi, channelsApi, productsApi, downloadBlob, statis
 import { useAuth } from '../context/AuthContext';
 
 const STATUS_BADGE = { completed:'badge-green', pending:'badge-amber', shipping:'badge-blue', cancelled:'badge-red' };
-const fmt = n => n?.toLocaleString('vi-VN') ?? '—';
+const fmt    = n => n?.toLocaleString('vi-VN') ?? '—';
+const fmtRev = n => n == null ? '—' : Math.round(n).toLocaleString('vi-VN');
 
 export default function OrdersPage() {
   const { isAdmin, isStaff } = useAuth();
   const navigate = useNavigate();
-  const [orders, setOrders]     = useState([]);
-  const [total, setTotal]       = useState(0);
-  const [page, setPage]         = useState(1);
-  const [loading, setLoading]   = useState(false);
-  const [search, setSearch]     = useState('');
+  const [orders, setOrders]       = useState([]);
+  const [total, setTotal]         = useState(0);
+  const [kpiRevenue, setKpiRevenue] = useState(null); // doanh thu theo filter
+  const [kpiShipping, setKpiShipping] = useState(0);
+  const [page, setPage]           = useState(1);
+  const [loading, setLoading]     = useState(false);
+  const [search, setSearch]       = useState('');
   const [channelId, setChannelId] = useState('');
-  const [status, setStatus]     = useState('');
-  const [fromDate, setFromDate] = useState('2025-01-01');
-  const [toDate, setToDate]     = useState('2025-03-31');
+  const [status, setStatus]       = useState('');
+  const [fromDate, setFromDate]   = useState('');
+  const [toDate, setToDate]       = useState('');
 
   const [channels, setChannels]   = useState([]);
   const [customers, setCustomers] = useState([]);
@@ -44,23 +47,40 @@ export default function OrdersPage() {
   };
 
   const load = useCallback(async () => {
+    if (!fromDate || !toDate) return;
     setLoading(true);
     try {
       const r = await ordersApi.getAll({ page, pageSize: PAGE_SIZE, search, channelId: channelId||undefined, status: status||undefined, fromDate, toDate });
       setOrders(r.data.items || r.data);
       setTotal(r.data.totalCount || r.data.length || 0);
+      // Lấy KPI doanh thu theo filter hiện tại
+      statisticsApi.getSummaryReport({ fromDate, toDate, channelId: channelId||undefined })
+        .then(sr => {
+          setKpiRevenue(sr.data?.kpi?.totalRevenue ?? null);
+          const allOrders = sr.data?.kpi?.totalOrdersAll ?? 0;
+          const completed = sr.data?.kpi?.totalOrdersCompleted ?? 0;
+          setKpiShipping(allOrders - completed);
+        }).catch(() => {});
     } catch { showToast('Không tải được danh sách đơn hàng', 'error'); }
     finally { setLoading(false); }
   }, [page, search, channelId, status, fromDate, toDate]);
 
   useEffect(() => {
-    document.getElementById('page-title-slot').textContent = 'Đơn hàng';
-    Promise.all([channelsApi.getAll(), customersApi.getAll(), productsApi.getAll()])
-      .then(([ch, cu, pr]) => {
-        setChannels(ch.data?.items || ch.data || []);
-        setCustomers(cu.data?.items || cu.data || []);
-        setProducts(pr.data?.items || pr.data || []);
-      });
+    { const _t = document.getElementById('page-title-slot'); if (_t) _t.textContent = 'Đơn hàng'; }
+    Promise.all([
+      channelsApi.getAll(),
+      customersApi.getAll({ pageSize: 500 }),
+      productsApi.getAll({ pageSize: 500, isActive: true }),
+    ]).then(([ch, cu, pr]) => {
+      setChannels(ch.data?.items || ch.data || []);
+      setCustomers(cu.data?.items || cu.data || []);
+      setProducts(pr.data?.items || pr.data || []);
+    });
+    // Lấy khoảng ngày từ DB để init filter
+    statisticsApi.getDateRange().then(r => {
+      setFromDate(r.data.minDate);
+      setToDate(r.data.maxDate);
+    }).catch(() => { setFromDate('2025-01-01'); setToDate('2025-12-31'); });
   }, []);
 
   useEffect(() => { load(); }, [load]);
@@ -120,7 +140,11 @@ export default function OrdersPage() {
     <div>
       {/* Stats strip */}
       <div style={{display:'flex',gap:10,marginBottom:16,flexWrap:'wrap'}}>
-        {[{label:'Tổng đơn',val:total,color:'var(--green)'},{label:'Doanh thu',val:'1.25 tỷ',color:'var(--green3)'},{label:'Đang giao',val:'—',color:'var(--blue)'}].map((s,i)=>(
+        {[
+          {label:'Tổng đơn', val: total, color:'var(--green)'},
+          {label:'Doanh thu', val: kpiRevenue != null ? fmtRev(kpiRevenue)+' VNĐ' : '…', color:'var(--green3)'},
+          {label:'Chưa hoàn thành', val: kpiShipping > 0 ? kpiShipping : '—', color:'var(--blue)'},
+        ].map((s,i)=>(
           <div key={i} className="card" style={{padding:'10px 16px',display:'flex',alignItems:'center',gap:10}}>
             <div style={{width:6,height:6,borderRadius:'50%',background:s.color}}/>
             <div style={{fontSize:11,color:'var(--dim)'}}>
@@ -168,7 +192,7 @@ export default function OrdersPage() {
                   <td style={{color:'var(--dim)'}}>{o.orderDate?.slice(0,10)}</td>
                   <td>{o.customerName || '—'}</td>
                   <td><span style={{display:'inline-block',padding:'2px 8px',borderRadius:4,fontSize:10,background:'rgba(167,139,250,.1)',color:'var(--purple)',fontFamily:'Space Mono,monospace'}}>{o.channelName}</span></td>
-                  <td style={{fontFamily:'Space Mono,monospace',color:'var(--green3)'}}>{fmt(o.totalAmount)} đ</td>
+                  <td style={{fontFamily:'Space Mono,monospace',color:'var(--green3)'}}>{fmt(o.totalAmount)} VNĐ</td>
                   <td><span className={`badge ${STATUS_BADGE[o.status]||'badge-blue'}`}>{o.status}</span></td>
                   <td onClick={e=>e.stopPropagation()} style={{display:'flex',gap:4}}>
                     {isStaff && <button className="btn btn-ghost btn-sm" onClick={()=>openEdit(o)}>✏</button>}
@@ -238,7 +262,7 @@ export default function OrdersPage() {
               {form.orderDetails.map((d,i)=>(
                 <div key={i} style={{display:'flex',justifyContent:'space-between',padding:'6px 10px',background:'rgba(34,197,94,.04)',border:'1px solid rgba(34,197,94,.1)',borderRadius:6,marginBottom:4,fontSize:12}}>
                   <span>SP #{d.productId} × {d.quantity}</span>
-                  <span style={{color:'var(--green3)',fontFamily:'Space Mono,monospace'}}>{fmt(d.quantity*d.unitPrice)} đ</span>
+                  <span style={{color:'var(--green3)',fontFamily:'Space Mono,monospace'}}>{fmt(d.quantity*d.unitPrice)} VNĐ</span>
                   <button className="btn btn-danger btn-sm" onClick={()=>setForm(f=>({...f,orderDetails:f.orderDetails.filter((_,j)=>j!==i)}))}>✕</button>
                 </div>
               ))}

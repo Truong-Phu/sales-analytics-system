@@ -1,4 +1,4 @@
-﻿// ============================================================
+// ============================================================
 // FILE: Repositories/UserRepository.cs
 // Mục đích: Quản lý người dùng — UC2: Quản lý người dùng và phân quyền
 // ============================================================
@@ -121,4 +121,46 @@ public class UserRepository : IUserRepository
         await _db.SaveChangesAsync();
         return true;
     }
+
+    public async Task<List<UserDto>> GetPendingUsersAsync()
+    {
+        var users = await _db.Users
+            .Include(u => u.Role)
+            .Where(u => u.IsApproved == false && u.IsActive == true)
+            .OrderBy(u => u.CreatedAt)
+            .ToListAsync();
+
+        return users.Select(u => new UserDto
+        {
+            UserId = u.UserId,
+            Username = u.Username,
+            FullName = u.FullName,
+            Email = u.Email,
+            RoleName = u.Role?.RoleName ?? "Staff",
+            IsActive = u.IsActive,
+            IsApproved = u.IsApproved,
+            CreatedAt = u.CreatedAt,
+        }).ToList();
+    }
+
+    public async Task<bool> ApproveUserAsync(int userId)
+    {
+        var user = await _db.Users.FindAsync(userId);
+        if (user == null || user.IsApproved) return false;
+        user.IsApproved = true;
+        user.UpdatedAt = DateTime.UtcNow;
+        await _db.SaveChangesAsync();
+        return true;
+    }
+
+    public async Task<bool> RejectUserAsync(int userId)
+    {
+        var user = await _db.Users.FindAsync(userId);
+        if (user == null || user.IsApproved) return false;
+        // Xóa tài khoản chưa duyệt
+        _db.Users.Remove(user);
+        await _db.SaveChangesAsync();
+        return true;
+    }
+
 }

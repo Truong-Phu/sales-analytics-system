@@ -1,4 +1,4 @@
-﻿// ============================================================
+// ============================================================
 // FILE: Controllers/ChannelsController.cs
 // UC10: Quản lý kênh bán hàng
 // ============================================================
@@ -17,13 +17,13 @@ namespace SalesAnalytics.API.Controllers;
 public class ChannelsController : ControllerBase
 {
     private readonly IChannelRepository _repo;
-    private readonly ILogRepository _logRepo;
+    private readonly ILogRepository     _logRepo;
 
     public ChannelsController(
         IChannelRepository repo,
-        ILogRepository logRepo)
+        ILogRepository     logRepo)
     {
-        _repo = repo;
+        _repo    = repo;
         _logRepo = logRepo;
     }
 
@@ -70,7 +70,7 @@ public class ChannelsController : ControllerBase
         {
             ChannelName = dto.ChannelName.Trim(),
             Description = dto.Description?.Trim(),
-            IsActive = true
+            IsActive    = true
         };
 
         var created = await _repo.CreateAsync(channel);

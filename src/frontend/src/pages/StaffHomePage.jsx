@@ -1,4 +1,4 @@
-﻿// ============================================================
+// ============================================================
 // FILE: src/pages/StaffHomePage.jsx
 // Trang chủ dành riêng cho Staff sau khi đăng nhập
 // Hiển thị công việc hằng ngày: nhập đơn, quản lý khách hàng
@@ -19,7 +19,7 @@ export default function StaffHomePage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    document.getElementById('page-title-slot').textContent = 'Trang chủ';
+    { const _t = document.getElementById('page-title-slot'); if (_t) _t.textContent = 'Trang chủ'; }
     const t = setInterval(() => setClock(new Date().toLocaleTimeString('vi-VN')), 1000);
 
     Promise.all([
@@ -39,10 +39,10 @@ export default function StaffHomePage() {
   const STATUS_BADGE = { completed:'badge-green', pending:'badge-amber', shipping:'badge-blue', cancelled:'badge-red' };
 
   const quickActions = [
-    { icon: '📋', label: 'Tạo đơn hàng mới', desc: 'UC3: Thu thập dữ liệu bán hàng', to: '/orders', color: '#22c55e' },
-    { icon: '👥', label: 'Thêm khách hàng',  desc: 'UC11: Quản lý khách hàng',        to: '/customers', color: '#60a5fa' },
-    { icon: '📦', label: 'Xem sản phẩm',     desc: 'UC9: Danh sách sản phẩm',         to: '/products', color: '#fbbf24' },
-    { icon: '📋', label: 'Quản lý đơn hàng', desc: 'UC4: Tìm kiếm, sửa, xóa',        to: '/orders', color: '#a78bfa' },
+    { icon: '📋', label: 'Tạo đơn hàng mới', desc: 'Tạo và ghi nhận đơn hàng mới', to: '/orders', color: '#22c55e' },
+    { icon: '👥', label: 'Thêm khách hàng',  desc: 'Thêm và quản lý khách hàng',        to: '/customers', color: '#60a5fa' },
+    { icon: '📦', label: 'Xem sản phẩm',     desc: 'Xem danh sách sản phẩm',         to: '/products', color: '#fbbf24' },
+    { icon: '📋', label: 'Quản lý đơn hàng', desc: 'Tìm kiếm, chỉnh sửa đơn hàng',        to: '/orders', color: '#a78bfa' },
   ];
 
   return (
