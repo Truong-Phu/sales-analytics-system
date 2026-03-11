@@ -28,6 +28,7 @@ builder.Services.AddScoped<IChannelRepository, ChannelRepository>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<IStatisticsRepository, StatisticsRepository>();
 builder.Services.AddScoped<ILogRepository, LogRepository>();
+builder.Services.AddScoped<IImportRepository, ImportRepository>();
 
 // ─── 3. JWT AUTHENTICATION ────────────────────────────────────
 var jwtKey = builder.Configuration["Jwt:Key"]

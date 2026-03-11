@@ -23,34 +23,34 @@ public class StatisticsRepository : IStatisticsRepository
 
         var orders = await _db.Orders.ToListAsync();
         var totalCustomers = await _db.Customers.CountAsync();
-        var totalProducts  = await _db.Products.CountAsync();
+        var totalProducts = await _db.Products.CountAsync();
 
         return new DashboardKpiDto
         {
-            TotalOrdersAll       = orders.Count,
+            TotalOrdersAll = orders.Count,
             TotalOrdersCompleted = orders.Count(o => o.Status == "completed"),
             TotalOrdersCancelled = orders.Count(o => o.Status == "cancelled"),
-            TotalOrdersRefunded  = orders.Count(o => o.Status == "refunded"),
-            TotalRevenue         = orders.Where(o => o.Status == "completed")
+            TotalOrdersRefunded = orders.Count(o => o.Status == "refunded"),
+            TotalRevenue = orders.Where(o => o.Status == "completed")
                                          .Sum(o => o.TotalAmount),
-            AvgOrderValue        = orders.Any(o => o.Status == "completed")
+            AvgOrderValue = orders.Any(o => o.Status == "completed")
                                        ? orders.Where(o => o.Status == "completed")
                                                .Average(o => o.TotalAmount)
                                        : 0,
-            OrdersThisMonth      = orders.Count(o => o.Status == "completed"
+            OrdersThisMonth = orders.Count(o => o.Status == "completed"
                                                    && o.OrderDate.Month == thisMonth
                                                    && o.OrderDate.Year == thisYear),
-            RevenueThisMonth     = orders.Where(o => o.Status == "completed"
+            RevenueThisMonth = orders.Where(o => o.Status == "completed"
                                                    && o.OrderDate.Month == thisMonth
                                                    && o.OrderDate.Year == thisYear)
                                          .Sum(o => o.TotalAmount),
-            OrdersToday          = orders.Count(o => o.Status == "completed"
+            OrdersToday = orders.Count(o => o.Status == "completed"
                                                    && o.OrderDate == today),
-            RevenueToday         = orders.Where(o => o.Status == "completed"
+            RevenueToday = orders.Where(o => o.Status == "completed"
                                                    && o.OrderDate == today)
                                          .Sum(o => o.TotalAmount),
-            TotalCustomers       = totalCustomers,
-            TotalProducts        = totalProducts,
+            TotalCustomers = totalCustomers,
+            TotalProducts = totalProducts,
         };
     }
 
@@ -65,19 +65,19 @@ public class StatisticsRepository : IStatisticsRepository
 
         return new DashboardKpiDto
         {
-            TotalOrdersAll       = orders.Count,
+            TotalOrdersAll = orders.Count,
             TotalOrdersCompleted = completed.Count,
             TotalOrdersCancelled = orders.Count(o => o.Status == "cancelled"),
-            TotalOrdersRefunded  = orders.Count(o => o.Status == "refunded"),
-            TotalRevenue         = completed.Sum(o => o.TotalAmount),
-            AvgOrderValue        = completed.Any()
+            TotalOrdersRefunded = orders.Count(o => o.Status == "refunded"),
+            TotalRevenue = completed.Sum(o => o.TotalAmount),
+            AvgOrderValue = completed.Any()
                                        ? completed.Average(o => o.TotalAmount)
                                        : 0,
             // Trong kỳ không có khái niệm "tháng này/hôm nay" — để 0
-            OrdersThisMonth  = 0,
+            OrdersThisMonth = 0,
             RevenueThisMonth = 0,
-            OrdersToday      = 0,
-            RevenueToday     = 0,
+            OrdersToday = 0,
+            RevenueToday = 0,
         };
     }
 
@@ -90,15 +90,15 @@ public class StatisticsRepository : IStatisticsRepository
             .Where(o => o.Status == "completed");
 
         if (from.HasValue) q = q.Where(o => o.OrderDate >= from);
-        if (to.HasValue)   q = q.Where(o => o.OrderDate <= to);
+        if (to.HasValue) q = q.Where(o => o.OrderDate <= to);
 
         var result = await q
             .GroupBy(o => o.Channel.ChannelName)
             .Select(g => new RevenueByChannelDto
             {
-                ChannelName   = g.Key,
-                TotalOrders   = g.Count(),
-                TotalRevenue  = g.Sum(o => o.TotalAmount),
+                ChannelName = g.Key,
+                TotalOrders = g.Count(),
+                TotalRevenue = g.Sum(o => o.TotalAmount),
                 AvgOrderValue = g.Average(o => o.TotalAmount)
             })
             .OrderByDescending(x => x.TotalRevenue)
@@ -117,10 +117,10 @@ public class StatisticsRepository : IStatisticsRepository
             .GroupBy(o => new { o.OrderDate.Year, o.OrderDate.Month })
             .Select(g => new RevenueByMonthDto
             {
-                Year         = g.Key.Year,
-                Month        = g.Key.Month,
-                YearMonth    = $"{g.Key.Year}-{g.Key.Month:D2}",
-                TotalOrders  = g.Count(),
+                Year = g.Key.Year,
+                Month = g.Key.Month,
+                YearMonth = $"{g.Key.Year}-{g.Key.Month:D2}",
+                TotalOrders = g.Count(),
                 TotalRevenue = g.Sum(o => o.TotalAmount)
             })
             .OrderBy(x => x.Year).ThenBy(x => x.Month)
@@ -140,9 +140,9 @@ public class StatisticsRepository : IStatisticsRepository
             .GroupBy(o => o.OrderDate)
             .Select(g => new RevenueByDayDto
             {
-                OrderDate    = g.Key,
-                DateLabel    = g.Key.ToString("dd/MM/yyyy"),
-                TotalOrders  = g.Count(),
+                OrderDate = g.Key,
+                DateLabel = g.Key.ToString("dd/MM/yyyy"),
+                TotalOrders = g.Count(),
                 TotalRevenue = g.Sum(o => o.TotalAmount)
             })
             .OrderBy(x => x.OrderDate)
@@ -162,7 +162,7 @@ public class StatisticsRepository : IStatisticsRepository
             .Where(od => od.Order.Status == "completed");
 
         if (from.HasValue) q = q.Where(od => od.Order.OrderDate >= from);
-        if (to.HasValue)   q = q.Where(od => od.Order.OrderDate <= to);
+        if (to.HasValue) q = q.Where(od => od.Order.OrderDate <= to);
 
         var grouped = await q
             .GroupBy(od => new
@@ -178,8 +178,8 @@ public class StatisticsRepository : IStatisticsRepository
                 g.Key.ProductName,
                 g.Key.CategoryName,
                 TotalQuantitySold = (long)g.Sum(od => od.Quantity),
-                TotalRevenue      = g.Sum(od => od.Subtotal),
-                TotalOrders       = g.Select(od => od.OrderId).Distinct().Count()
+                TotalRevenue = g.Sum(od => od.Quantity * od.UnitPrice * (1 - od.Discount / 100)),
+                TotalOrders = g.Select(od => od.OrderId).Distinct().Count()
             })
             .OrderByDescending(x => x.TotalRevenue)
             .Take(topN)
@@ -187,13 +187,13 @@ public class StatisticsRepository : IStatisticsRepository
 
         return grouped.Select((x, i) => new TopProductDto
         {
-            Rank              = i + 1,
-            ProductId         = x.ProductId,
-            ProductName       = x.ProductName,
-            CategoryName      = x.CategoryName,
+            Rank = i + 1,
+            ProductId = x.ProductId,
+            ProductName = x.ProductName,
+            CategoryName = x.CategoryName,
             TotalQuantitySold = x.TotalQuantitySold,
-            TotalRevenue      = x.TotalRevenue,
-            TotalOrders       = x.TotalOrders
+            TotalRevenue = x.TotalRevenue,
+            TotalOrders = x.TotalOrders
         }).ToList();
     }
 
@@ -207,22 +207,22 @@ public class StatisticsRepository : IStatisticsRepository
             .Where(od => od.Order.Status == "completed");
 
         if (from.HasValue) q = q.Where(od => od.Order.OrderDate >= from);
-        if (to.HasValue)   q = q.Where(od => od.Order.OrderDate <= to);
+        if (to.HasValue) q = q.Where(od => od.Order.OrderDate <= to);
 
         var result = await q
             .GroupBy(od => new
             {
-                CategoryId   = od.Product.CategoryId ?? 0,
+                CategoryId = od.Product.CategoryId ?? 0,
                 CategoryName = od.Product.Category != null
                     ? od.Product.Category.CategoryName : "Chưa phân loại"
             })
             .Select(g => new RevenueByCategoryDto
             {
-                CategoryId    = g.Key.CategoryId,
-                CategoryName  = g.Key.CategoryName,
-                TotalOrders   = g.Select(od => od.OrderId).Distinct().Count(),
+                CategoryId = g.Key.CategoryId,
+                CategoryName = g.Key.CategoryName,
+                TotalOrders = g.Select(od => od.OrderId).Distinct().Count(),
                 TotalQuantity = (long)g.Sum(od => od.Quantity),
-                TotalRevenue  = g.Sum(od => od.Subtotal)
+                TotalRevenue = g.Sum(od => od.Quantity * od.UnitPrice * (1 - od.Discount / 100))
             })
             .OrderByDescending(x => x.TotalRevenue)
             .ToListAsync();
@@ -248,20 +248,20 @@ public class StatisticsRepository : IStatisticsRepository
     public async Task<ReportSummaryDto> GetReportSummaryAsync(
         DateOnly from, DateOnly to)
     {
-        var kpi         = await GetKpiByPeriodAsync(from, to);   // KPI theo kỳ
-        var byChannel   = await GetRevenueByChannelAsync(from, to);
+        var kpi = await GetKpiByPeriodAsync(from, to);   // KPI theo kỳ
+        var byChannel = await GetRevenueByChannelAsync(from, to);
         var topProducts = await GetTopProductsAsync(from, to, 10);
-        var byMonth     = await GetRevenueByMonthAsync(from, to);
-        var byCategory  = await GetRevenueByCategoryAsync(from, to);
+        var byMonth = await GetRevenueByMonthAsync(from, to);
+        var byCategory = await GetRevenueByCategoryAsync(from, to);
 
         return new ReportSummaryDto
         {
-            FromDate          = from,
-            ToDate            = to,
-            Kpi               = kpi,
-            RevenueByChannel  = byChannel,
-            TopProducts       = topProducts,
-            RevenueByMonth    = byMonth,
+            FromDate = from,
+            ToDate = to,
+            Kpi = kpi,
+            RevenueByChannel = byChannel,
+            TopProducts = topProducts,
+            RevenueByMonth = byMonth,
             RevenueByCategory = byCategory
         };
     }

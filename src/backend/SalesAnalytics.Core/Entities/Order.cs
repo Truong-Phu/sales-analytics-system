@@ -14,6 +14,7 @@ public class Order
     public decimal TotalAmount { get; set; }
     public string Status { get; set; } = "completed";
     public string? Note { get; set; }
+    public string? ExternalOrderId { get; set; }  // Mã đơn gốc từ sàn (Shopee, TikTok...)
     public int? CreatedBy { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;

@@ -21,6 +21,7 @@ public class AppDbContext : DbContext
     public DbSet<Order> Orders => Set<Order>();
     public DbSet<OrderDetail> OrderDetails => Set<OrderDetail>();
     public DbSet<Log> Logs => Set<Log>();
+    public DbSet<ImportLog> ImportLogs => Set<ImportLog>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -48,9 +49,9 @@ public class AppDbContext : DbContext
             e.Property(x => x.Email).HasColumnName("email").HasMaxLength(100);
             e.Property(x => x.RoleId).HasColumnName("role_id").IsRequired();
             e.Property(x => x.IsActive).HasColumnName("is_active").HasDefaultValue(true);
+            e.Property(x => x.IsApproved).HasColumnName("is_approved").HasDefaultValue(true);
             e.Property(x => x.CreatedAt).HasColumnName("created_at").HasDefaultValueSql("CURRENT_TIMESTAMP");
             e.Property(x => x.UpdatedAt).HasColumnName("updated_at").HasDefaultValueSql("CURRENT_TIMESTAMP");
-            e.Property(x => x.IsApproved).HasColumnName("is_approved").HasDefaultValue(true);
             e.HasIndex(x => x.Username).IsUnique();
 
             e.HasOne(x => x.Role)
@@ -130,6 +131,7 @@ public class AppDbContext : DbContext
             e.Property(x => x.TotalAmount).HasColumnName("total_amount").HasPrecision(14, 2).HasDefaultValue(0);
             e.Property(x => x.Status).HasColumnName("status").HasMaxLength(20).HasDefaultValue("completed");
             e.Property(x => x.Note).HasColumnName("note");
+            e.Property(x => x.ExternalOrderId).HasColumnName("external_order_id").HasMaxLength(100);
             e.Property(x => x.CreatedBy).HasColumnName("created_by");
             e.Property(x => x.CreatedAt).HasColumnName("created_at").HasDefaultValueSql("CURRENT_TIMESTAMP");
             e.Property(x => x.UpdatedAt).HasColumnName("updated_at").HasDefaultValueSql("CURRENT_TIMESTAMP");
@@ -193,6 +195,23 @@ public class AppDbContext : DbContext
              .WithMany(u => u.Logs)
              .HasForeignKey(x => x.UserId)
              .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // ─── IMPORT LOG ─────────────────────────────────────
+        modelBuilder.Entity<ImportLog>(e =>
+        {
+            e.ToTable("import_logs");
+            e.HasKey(x => x.ImportId);
+            e.Property(x => x.ImportId).HasColumnName("import_id").UseIdentityByDefaultColumn();
+            e.Property(x => x.FileName).HasColumnName("file_name").HasMaxLength(255).IsRequired();
+            e.Property(x => x.Source).HasColumnName("source").HasMaxLength(50).IsRequired();
+            e.Property(x => x.TotalRows).HasColumnName("total_rows");
+            e.Property(x => x.ImportedRows).HasColumnName("imported_rows");
+            e.Property(x => x.SkippedRows).HasColumnName("skipped_rows");
+            e.Property(x => x.Status).HasColumnName("status").HasMaxLength(20);
+            e.Property(x => x.ImportedBy).HasColumnName("imported_by").IsRequired();
+            e.Property(x => x.ImportedAt).HasColumnName("imported_at").HasDefaultValueSql("CURRENT_TIMESTAMP");
+            e.Property(x => x.Notes).HasColumnName("notes");
         });
     }
 }

@@ -6,8 +6,10 @@ using System.Security.Claims;
 using ClosedXML.Excel;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using SalesAnalytics.Core.DTOs.Statistics;
 using SalesAnalytics.Core.Interfaces;
+using SalesAnalytics.Infrastructure.Data;
 
 namespace SalesAnalytics.API.Controllers;
 
@@ -18,11 +20,13 @@ public class StatisticsController : ControllerBase
 {
     private readonly IStatisticsRepository _repo;
     private readonly ILogRepository _logRepo;
+    private readonly AppDbContext _db;
 
-    public StatisticsController(IStatisticsRepository repo, ILogRepository logRepo)
+    public StatisticsController(IStatisticsRepository repo, ILogRepository logRepo, AppDbContext db)
     {
         _repo = repo;
         _logRepo = logRepo;
+        _db = db;
     }
 
     private int CurrentUserId =>
@@ -102,6 +106,22 @@ public class StatisticsController : ControllerBase
         [FromQuery] DateOnly? fromDate = null,
         [FromQuery] DateOnly? toDate = null)
         => Ok(await _repo.GetRevenueByCategoryAsync(fromDate, toDate));
+
+    // ─── UC7: Dữ liệu báo cáo tổng hợp (JSON) ────────────
+    /// <summary>UC7: Lấy dữ liệu báo cáo tổng hợp (JSON)</summary>
+    [HttpGet("report/summary")]
+    [Authorize(Policy = "ManagerOnly")]
+    public async Task<IActionResult> GetReportSummary(
+        [FromQuery] DateOnly? fromDate = null,
+        [FromQuery] DateOnly? toDate = null)
+    {
+        var from = fromDate ?? DateOnly.FromDateTime(new DateTime(DateTime.Today.Year, 1, 1));
+        var to = toDate ?? DateOnly.FromDateTime(DateTime.Today);
+        var report = await _repo.GetReportSummaryAsync(from, to);
+        await _logRepo.AddAsync(CurrentUserId, "VIEW_REPORT",
+                                ipAddress: HttpContext.Connection.RemoteIpAddress?.ToString());
+        return Ok(report);
+    }
 
     // ─── UC7: Xuất báo cáo Excel ──────────────────────────
     /// <summary>UC7: Xuất báo cáo tổng hợp dạng Excel</summary>
@@ -184,23 +204,25 @@ public class StatisticsController : ControllerBase
                     fileName);
     }
 
-    // ─── UC7: Dữ liệu báo cáo (JSON — dùng để xuất PDF phía Frontend) ─
-    /// <summary>UC7: Lấy dữ liệu báo cáo tổng hợp (JSON)</summary>
-    [HttpGet("report/summary")]
-    [Authorize(Policy = "ManagerOnly")]
-    public async Task<IActionResult> GetReportSummary(
-        [FromQuery] DateOnly? fromDate = null,
-        [FromQuery] DateOnly? toDate = null)
+    // ─── DEBUG: Xem N đơn hàng mới nhất (không lọc ngày) ───
+    /// <summary>DEBUG: Verify import — lấy N đơn hàng mới nhất theo order_id</summary>
+    [HttpGet("debug/last-orders")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> GetLastOrders([FromQuery] int n = 10)
     {
-        var from = fromDate ?? DateOnly.FromDateTime(new DateTime(DateTime.Today.Year, 1, 1));
-        var to = toDate ?? DateOnly.FromDateTime(DateTime.Today);
-        var report = await _repo.GetReportSummaryAsync(from, to);
-        await _logRepo.AddAsync(CurrentUserId, "VIEW_REPORT",
-                                ipAddress: HttpContext.Connection.RemoteIpAddress?.ToString());
-        return Ok(report);
+        var items = await _db.Orders
+            .OrderByDescending(o => o.OrderId)
+            .Take(n)
+            .Select(o => new {
+                o.OrderId,
+                o.OrderDate,
+                o.TotalAmount,
+                o.Status,
+                o.ExternalOrderId,
+                ChannelName = o.Channel.ChannelName,
+                CustomerName = o.Customer != null ? o.Customer.CustomerName : "—",
+            })
+            .ToListAsync();
+        return Ok(items);
     }
 }
-
-// ============================================================
-// FILE: Controllers/LogsController.cs
-// UC8: Ghi log và theo dõi hoạt động hệ thống (Admin only)

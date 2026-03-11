@@ -147,6 +147,17 @@ export const logsApi = {
   exportExcel: (params) => api.get('/logs/export/excel', { params, responseType: 'blob' }),
 };
 
+// ══════════════════════════════════════════════════════════
+// IMPORT — UC3 Mở rộng
+// ══════════════════════════════════════════════════════════
+export const importApi = {
+  downloadTemplate: ()           => api.get('/import/template/excel', { responseType: 'blob' }),
+  preview:          (formData)   => api.post('/import/preview', formData,
+                                     { headers: { 'Content-Type': 'multipart/form-data' } }),
+  confirm:          (dto)        => api.post('/import/confirm', dto),
+  getHistory:       (params)     => api.get('/import/history', { params }),
+};
+
 // ─── Helper: tải file blob ────────────────────────────────
 export const downloadBlob = (blob, filename) => {
   const url = window.URL.createObjectURL(blob);

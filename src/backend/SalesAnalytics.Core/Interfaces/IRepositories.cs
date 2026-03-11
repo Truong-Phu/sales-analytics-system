@@ -1,3 +1,4 @@
+using SalesAnalytics.Core.DTOs.Import;
 // ============================================================
 // INTERFACES — Repository pattern
 // ============================================================
@@ -107,4 +108,30 @@ public interface ILogRepository
     Task AddAsync(int userId, string action, string? tableName = null,
                   int? recordId = null, string? ipAddress = null);
     Task<PagedLogsDto> GetAllAsync(int page, int pageSize, int? userId);
+}
+
+// --- UC3 Mở rộng: Import đơn hàng từ file ---
+public interface IImportRepository
+{
+    /// <summary>Kiểm tra đơn hàng đã tồn tại chưa (theo external_order_id + channel)</summary>
+    Task<bool> IsOrderExistsAsync(string externalOrderId, int channelId);
+
+    /// <summary>Lấy hoặc tạo mới Customer theo tên + phone</summary>
+    Task<int> GetOrCreateCustomerAsync(string name, string? phone);
+
+    /// <summary>Lấy channel_id theo tên kênh</summary>
+    Task<int?> GetChannelIdByNameAsync(string channelName);
+
+    /// <summary>Lấy product_id theo tên sản phẩm (gần đúng)</summary>
+    Task<int?> GetProductIdByNameAsync(string productName);
+
+    /// <summary>Import 1 batch đơn hàng đã validate vào DB</summary>
+    Task<ImportResultDto> SaveImportBatchAsync(
+        List<ImportRowDto> rows,
+        int importedByUserId,
+        string source,
+        string fileName);
+
+    /// <summary>Lấy lịch sử import</summary>
+    Task<List<ImportHistoryDto>> GetHistoryAsync(int page, int pageSize);
 }
