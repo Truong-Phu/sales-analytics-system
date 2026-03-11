@@ -42,7 +42,7 @@ export default function ChannelsPage() {
         {isAdmin&&<button className="btn btn-primary" onClick={()=>{setForm({channelName:''});setSelected(null);setModal('form')}}>+ Thêm kênh</button>}
       </div>
       <div className="card table-wrap">
-        <div className="card-header"><span className="card-title">Kênh bán hàng — UC10</span><span style={{fontSize:11,color:'var(--dim)',fontFamily:'Space Mono,monospace'}}>{items.length} kênh</span></div>
+        <div className="card-header"><span className="card-title">Kênh bán hàng</span><span style={{fontSize:13,color:'var(--text3)',fontWeight:500}}>{items.length} kênh</span></div>
         <table>
           <thead><tr><th>#</th><th>Tên kênh</th><th>Loại</th><th>Thao tác</th></tr></thead>
           <tbody>

@@ -179,7 +179,7 @@ export default function OrdersPage() {
       {/* Table */}
       <div className="card table-wrap">
         <div className="card-header">
-          <span className="card-title">Danh sách đơn hàng — UC4</span>
+          <span className="card-title">Danh sách đơn hàng</span>
           <span style={{fontSize:11,color:'var(--dim)',fontFamily:'Space Mono,monospace'}}>{total} đơn</span>
         </div>
         {loading ? <div style={{padding:32,textAlign:'center',color:'var(--dim)',fontFamily:'Space Mono,monospace'}}>// Đang tải...</div> : (
@@ -218,7 +218,7 @@ export default function OrdersPage() {
         <div className="modal-overlay" onClick={e=>e.target===e.currentTarget&&setModal(null)}>
           <div className="modal" style={{width:600}}>
             <div className="modal-head">
-              <div className="modal-title">{modal==='create'?'📋 Tạo đơn hàng mới — UC3':'✏ Sửa đơn hàng'}</div>
+              <div className="modal-title">{modal==='create'?'📋 Tạo đơn hàng mới':'✏ Sửa đơn hàng'}</div>
               <div className="modal-close" onClick={()=>setModal(null)}>✕</div>
             </div>
             <div className="modal-body">

@@ -59,10 +59,10 @@ export default function CustomersPage() {
       </div>
       <div className="card table-wrap">
         <div className="card-header">
-          <span className="card-title">Danh sách khách hàng — UC11</span>
+          <span className="card-title">Danh sách khách hàng</span>
           <span style={{fontSize:11,color:'var(--dim)',fontFamily:'Space Mono,monospace'}}>{total} khách hàng</span>
         </div>
-        {loading ? <div style={{padding:32,textAlign:'center',color:'var(--dim)',fontFamily:'Space Mono,monospace'}}>// Đang tải...</div> : (
+        {loading ? <div className="loading-wrap"><div className="spinner" /><span>Đang tải...</span></div> : (
           <table>
             <thead><tr><th>#</th><th>Họ tên</th><th>Số điện thoại</th><th>Email</th><th>Ngày tạo</th><th>Thao tác</th></tr></thead>
             <tbody>
@@ -84,7 +84,7 @@ export default function CustomersPage() {
         )}
         <div className="pagination">
           {Array.from({length:totalPages},(_,i)=><button key={i} className={`page-btn${page===i+1?' active':''}`} onClick={()=>setPage(i+1)}>{i+1}</button>)}
-          <span style={{marginLeft:'auto',fontSize:11,color:'var(--dim)',fontFamily:'Space Mono,monospace'}}>Trang {page}/{totalPages||1}</span>
+          <span style={{marginLeft:'auto',fontSize:13,color:'var(--text3)',fontWeight:500}}>Trang {page}/{totalPages||1}</span>
         </div>
       </div>
       {modal==='form'&&(

@@ -55,7 +55,7 @@ export default function UsersPage() {
         <button className="btn btn-primary" onClick={()=>{setForm({username:'',fullName:'',email:'',roleId:2,password:''});setSelected(null);setModal('form')}}>+ Thêm người dùng</button>
       </div>
       <div className="card table-wrap">
-        <div className="card-header"><span className="card-title">Quản lý người dùng — UC2</span><span style={{fontSize:11,color:'var(--dim)',fontFamily:'Space Mono,monospace'}}>{total} tài khoản</span></div>
+        <div className="card-header"><span className="card-title">Quản lý người dùng</span><span style={{fontSize:13,color:'var(--text3)',fontWeight:500}}>{total} tài khoản</span></div>
         {loading?<div style={{padding:32,textAlign:'center',color:'var(--dim)',fontFamily:'Space Mono,monospace'}}>// Đang tải...</div>:(
           <table>
             <thead><tr><th>#</th><th>Username</th><th>Họ tên</th><th>Email</th><th>Vai trò</th><th>Ngày tạo</th><th>Thao tác</th></tr></thead>

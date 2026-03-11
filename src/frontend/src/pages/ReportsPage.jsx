@@ -1,5 +1,5 @@
 // ============================================================
-// FILE: src/pages/ReportsPage.jsx — UC7: Xuất báo cáo tổng hợp
+// FILE: src/pages/ReportsPage.jsx 
 // Actor: Admin, Manager
 // Trang riêng cho chức năng xuất báo cáo — tách khỏi Thống kê
 // ============================================================
@@ -95,7 +95,7 @@ export default function ReportsPage() {
   ];
 
   return (
-    <div style={{ maxWidth: 860 }}>
+    <div>
       {/* Page description */}
       <div style={{
         padding: '14px 18px', marginBottom: 20,

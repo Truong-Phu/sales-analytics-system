@@ -42,10 +42,10 @@ export default function CategoriesPage() {
   };
 
   return (
-    <div style={{ maxWidth: 800 }}>
+    <div>
       <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:14 }}>
         <div style={{ fontSize:11, color:'var(--dim)', fontFamily:'Space Mono,monospace' }}>
-          // Quản lý danh mục sản phẩm — liên kết với UC9
+          Quản lý danh mục và liên kết với sản phẩm
         </div>
         <button className="btn btn-primary" onClick={()=>{ setForm({categoryName:''}); setModal(true); }}>+ Thêm danh mục</button>
       </div>
@@ -56,7 +56,7 @@ export default function CategoriesPage() {
           <span style={{ fontSize:11, color:'var(--dim)', fontFamily:'Space Mono,monospace' }}>{items.length} danh mục</span>
         </div>
         {loading ? (
-          <div style={{ padding:32, textAlign:'center', color:'var(--dim)', fontFamily:'Space Mono,monospace' }}>// Đang tải...</div>
+          <div className="loading-wrap"><div className="spinner" /><span>Đang tải...</span></div>
         ) : (
           <table>
             <thead><tr><th>#</th><th>Tên danh mục</th><th>Số sản phẩm</th><th>Thao tác</th></tr></thead>
@@ -104,7 +104,7 @@ export default function CategoriesPage() {
                   onKeyDown={e => e.key === 'Enter' && save()} />
               </div>
               <div style={{ fontSize:12, color:'var(--dim)', marginTop:8 }}>
-                Danh mục dùng để phân nhóm sản phẩm và hỗ trợ thống kê doanh thu theo nhóm (UC5).
+                Danh mục dùng để phân nhóm sản phẩm và hỗ trợ thống kê doanh thu theo nhóm.
               </div>
             </div>
             <div className="modal-footer">
