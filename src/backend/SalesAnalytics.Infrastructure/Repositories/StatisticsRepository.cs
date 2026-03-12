@@ -181,7 +181,8 @@ public class StatisticsRepository : IStatisticsRepository
                 TotalRevenue = g.Sum(od => od.Quantity * od.UnitPrice * (1 - od.Discount / 100)),
                 TotalOrders = g.Select(od => od.OrderId).Distinct().Count()
             })
-            .OrderByDescending(x => x.TotalRevenue)
+            .OrderByDescending(x => x.TotalQuantitySold)  // Bán chạy = số lượng bán nhiều nhất
+            .ThenByDescending(x => x.TotalRevenue)         // Cùng số lượng thì ưu tiên doanh thu cao hơn
             .Take(topN)
             .ToListAsync();
 
