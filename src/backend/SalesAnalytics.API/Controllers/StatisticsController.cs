@@ -277,7 +277,7 @@ public class StatisticsController : ControllerBase
 
         ws1.Row(4).Height = 18;
         ws1.Range("B4:G4").Merge();
-        ApplySub(ws1.Cell("B4"), $"Kỳ báo cáo: {from:dd/MM/yyyy} – {to:dd/MM/yyyy}  |  Sales Analytics GD1");
+        ApplySub(ws1.Cell("B4"), $"Kỳ báo cáo: {from:dd/MM/yyyy} – {to:dd/MM/yyyy}");
 
         ws1.Row(6).Height = 20;
         ws1.Range("B6:G6").Merge();

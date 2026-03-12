@@ -5,7 +5,7 @@
 import { useState, useEffect } from 'react';
 import { Bar, Line, Pie } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, PointElement, LineElement, ArcElement, Title, Tooltip, Legend, Filler } from 'chart.js';
-import { statisticsApi, downloadBlob } from '../services/api';
+import { statisticsApi, ordersApi, downloadBlob } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, PointElement, LineElement, ArcElement, Title, Tooltip, Legend, Filler);
@@ -77,6 +77,33 @@ export default function StatisticsPage() {
             downloadBlob(r.data, `BaoCao_${fromDate}_${toDate}.xlsx`);
             showToast('✓ Đã xuất báo cáo Excel');
         } catch { showToast('Lỗi xuất Excel', 'error'); }
+        finally { setExporting(false); }
+    };
+
+    const exportCsv = async () => {
+        setExporting(true);
+        try {
+            const r = await ordersApi.getAll({ page: 1, pageSize: 2000, fromDate, toDate });
+            const orders = r.data?.items || r.data || [];
+            if (orders.length === 0) { showToast('Không có dữ liệu trong kỳ này', 'error'); return; }
+            const header = ['Mã ĐH', 'Ngày đặt', 'Khách hàng', 'Kênh bán', 'Tổng tiền', 'Trạng thái'];
+            const rows = orders.map(o => [
+                o.orderId,
+                o.orderDate?.slice(0, 10) || '',
+                (o.customerName || 'Khách lẻ').replace(/,/g, ' '),
+                (o.channelName || '').replace(/,/g, ' '),
+                o.totalAmount || 0,
+                o.status || '',
+            ]);
+            const bom = '\uFEFF';
+            const csv = bom + [header, ...rows].map(r => r.join(',')).join('\n');
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url; a.download = `DonHang_${fromDate}_${toDate}.csv`;
+            a.click(); URL.revokeObjectURL(url);
+            showToast(`✓ Đã xuất ${orders.length} đơn hàng ra CSV`);
+        } catch { showToast('Lỗi xuất CSV', 'error'); }
         finally { setExporting(false); }
     };
 
@@ -297,7 +324,7 @@ export default function StatisticsPage() {
                 </div>
                 {[
                     { icon: '📊', name: 'Báo cáo tổng hợp Excel', desc: 'Sheet: Đơn hàng · Doanh thu · Top sản phẩm · Theo kênh', action: exportExcel, label: exporting ? '⟳ Đang xuất...' : '⬇ Tải Excel', cls: 'btn-export', disabled: exporting },
-                    { icon: '📋', name: 'Dữ liệu thô CSV', desc: 'Toàn bộ đơn hàng trong kỳ đã chọn', action: () => showToast('Tính năng đang phát triển', 'error'), label: '⬇ Tải CSV', cls: 'btn-ghost', disabled: false },
+                    { icon: '📋', name: 'Dữ liệu thô CSV', desc: 'Toàn bộ đơn hàng trong kỳ đã chọn', action: exportCsv, label: exporting ? '⟳ Đang xuất...' : '⬇ Tải CSV', cls: 'btn-blue', disabled: exporting },
                 ].map((e, i) => (
                     <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 18px', borderBottom: i === 0 ? '1px solid var(--border)' : 'none' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
